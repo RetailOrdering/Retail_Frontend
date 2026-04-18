@@ -1,0 +1,21 @@
+/* Force horizontal layout on large screens (Bootstrap already does, but enforce) */
+@media (min-width: 992px) {
+  .navbar-nav {
+    align-items: center;
+  }
+  .nav-item {
+    margin-left: 0.25rem;
+  }
+}
+.nav-link.active {
+  color: #f97316 !important;
+  font-weight: 600;
+}
+.nav-link {
+  font-weight: 500;
+  color: #334155;
+  transition: color 0.2s;
+}
+.nav-link:hover {
+  color: #f97316;
+}
