@@ -1,31 +1,35 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { delay } from 'rxjs/operators';
-import { Coupon } from '../../models/coupon';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { Coupon } from 'src/app/models/coupon';
+import { CreateCouponDto } from 'src/app/models/dto-models';
+import { environment } from 'src/environments/environments';
 
 @Injectable({ providedIn: 'root' })
 export class CouponService {
-  private mockCoupons: Coupon[] = [
-    {
-      id: 1,
-      code: 'SAVE10',
-      discountPercentage: 10,
-      expiryDate: new Date('2026-12-31'),
-      isActive: true,
-      minimumOrderAmount: 20
-    },
-    {
-      id: 2,
-      code: 'WELCOME5',
-      discountPercentage: 5,
-      expiryDate: new Date('2026-10-01'),
-      isActive: true,
-      minimumOrderAmount: 10
-    }
-  ];
+  constructor(private http: HttpClient) {}
+
+  getCoupons(): Observable<Coupon[]> {
+    return this.http.get<Coupon[]>(`${environment.apiUrl}/Coupon`);
+  }
+
+  createCoupon(coupon: CreateCouponDto): Observable<Coupon> {
+    return this.http.post<Coupon>(`${environment.apiUrl}/Coupon`, coupon);
+  }
 
   validateCoupon(code: string, orderTotal: number): Observable<Coupon | null> {
-    const coupon = this.mockCoupons.find(c => c.code === code && c.isActive && new Date() < c.expiryDate && orderTotal >= c.minimumOrderAmount);
-    return of(coupon || null).pipe(delay(300));
+    return this.http.post<Coupon | null>(`${environment.apiUrl}/Coupon/validate`, { code, orderTotal });
+  }
+
+  updateCoupon(id: number, coupon: Partial<Coupon>): Observable<Coupon> {
+    return this.http.put<Coupon>(`${environment.apiUrl}/Coupon/${id}`, coupon);
+  }
+
+  deleteCoupon(id: number): Observable<any> {
+    return this.http.delete(`${environment.apiUrl}/Coupon/${id}`);
+  }
+
+  toggleCouponStatus(id: number): Observable<any> {
+    return this.http.patch(`${environment.apiUrl}/Coupon/${id}/toggle`, {});
   }
 }

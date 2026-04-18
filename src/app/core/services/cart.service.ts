@@ -1,60 +1,50 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, of } from 'rxjs';
-import { CartItem } from '../../models/cart-item';
-import { Product } from '../../models/product';
+import { HttpClient } from '@angular/common/http';
+import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { environment } from 'src/environments/environments';
+import { Cart } from 'src/app/models/cart';
+import { AddToCartDto, UpdateCartItemDto } from 'src/app/models/dto-models';
+import { CartItem } from 'src/app/models/cart-item';
 
 @Injectable({ providedIn: 'root' })
 export class CartService {
   private cartItemsSubject = new BehaviorSubject<CartItem[]>([]);
   public cartItems$ = this.cartItemsSubject.asObservable();
 
-  constructor() {
-    const stored = localStorage.getItem('cart');
-    if (stored) this.cartItemsSubject.next(JSON.parse(stored));
+  constructor(private http: HttpClient) {
+    this.loadCart();
   }
 
-  private updateStorage(items: CartItem[]): void {
-    localStorage.setItem('cart', JSON.stringify(items));
-    this.cartItemsSubject.next(items);
+  private loadCart(): void {
+    this.http.get<Cart>(`${environment.apiUrl}/Cart`).subscribe({
+      next: (cart) => this.cartItemsSubject.next(cart.items || []),
+      error: () => this.cartItemsSubject.next([])
+    });
   }
 
-  addToCart(product: Product, quantity: number): void {
-    const current = this.cartItemsSubject.value;
-    const existing = current.find(item => item.productId === product.id);
-    if (existing) {
-      existing.quantity += quantity;
-      this.updateStorage([...current]);
-    } else {
-      const newItem: CartItem = {
-        id: Date.now(),
-        cartId: 0, // will be set on backend
-        productId: product.id,
-        quantity,
-        price: product.price,
-        productName: product.name,
-        totalPrice: product.price * quantity
-      };
-      this.updateStorage([...current, newItem]);
-    }
-  }
-
-  removeFromCart(productId: number): void {
-    const filtered = this.cartItemsSubject.value.filter(item => item.productId !== productId);
-    this.updateStorage(filtered);
-  }
-
-  updateQuantity(productId: number, quantity: number): void {
-    const current = this.cartItemsSubject.value.map(item =>
-      item.productId === productId ? { ...item, quantity, totalPrice: item.price * quantity } : item
+  addToCart(dto: AddToCartDto): Observable<any> {
+    return this.http.post(`${environment.apiUrl}/Cart/add`, dto).pipe(
+      tap(() => this.loadCart())
     );
-    this.updateStorage(current);
   }
 
-  clearCart(): void {
-    this.updateStorage([]);
+  
+
+  updateQuantity(itemId: number, dto: UpdateCartItemDto): Observable<any> {
+    return this.http.put(`${environment.apiUrl}/Cart/item/${itemId}`, dto).pipe(
+      tap(() => this.loadCart())
+    );
   }
 
-  getCartTotal(): number {
-    return this.cartItemsSubject.value.reduce((sum, item) => sum + (item.totalPrice || 0), 0);
+  removeFromCart(itemId: number): Observable<any> {
+    return this.http.delete(`${environment.apiUrl}/Cart/item/${itemId}`).pipe(
+      tap(() => this.loadCart())
+    );
+  }
+
+  clearCart(): Observable<any> {
+    return this.http.delete(`${environment.apiUrl}/Cart/clear`).pipe(
+      tap(() => this.cartItemsSubject.next([]))
+    );
   }
 }

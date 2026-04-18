@@ -1,11 +1,13 @@
+import { Order } from "./order";
+
 export interface User {
   id: number;
   name: string;
   email: string;
-  passwordHash: string;   // only used on login/register, not stored in frontend state
+  passwordHash: string;
   role: 'Admin' | 'Customer';
   createdAt: Date;
-  // navigation (optional)
+  orders?: Order[];
   loyaltyPoint?: LoyaltyPoint;
 }
 
@@ -13,5 +15,8 @@ export interface LoyaltyPoint {
   id: number;
   userId: number;
   points: number;
+  description: string;
+  type: string;
+  createdAt: Date;
   lastUpdated: Date;
 }

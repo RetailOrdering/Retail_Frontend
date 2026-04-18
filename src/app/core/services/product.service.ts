@@ -1,52 +1,31 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { delay } from 'rxjs/operators';
-import { Product } from '../../models/product';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { environment } from 'src/environments/environments';
+import { Product } from 'src/app/models/product';
+import { CreateProductDto, UpdateProductDto } from 'src/app/models/dto-models';
 
 @Injectable({ providedIn: 'root' })
 export class ProductService {
-  private mockProducts: Product[] = [
-    {
-      id: 1,
-      name: 'Margherita Pizza',
-      description: 'Classic cheese and tomato pizza',
-      price: 12.99,
-      imageUrl: 'assets/pizza.jpg',
-      categoryId: 1,
-      stock: 50,
-      isAvailable: true,
-      createdAt: new Date()
-    },
-    {
-      id: 2,
-      name: 'Cold Drink - Cola',
-      description: 'Refreshing cola 500ml',
-      price: 2.49,
-      imageUrl: 'assets/cola.jpg',
-      categoryId: 2,
-      stock: 200,
-      isAvailable: true,
-      createdAt: new Date()
-    },
-    {
-      id: 3,
-      name: 'Garlic Bread',
-      description: 'Toasted bread with garlic butter',
-      price: 4.99,
-      imageUrl: 'assets/garlic-bread.jpg',
-      categoryId: 3,
-      stock: 100,
-      isAvailable: true,
-      createdAt: new Date()
-    }
-  ];
+  constructor(private http: HttpClient) {}
 
   getProducts(): Observable<Product[]> {
-    return of(this.mockProducts).pipe(delay(300));
+    return this.http.get<Product[]>(`${environment.apiUrl}/Product`);
   }
 
-  getProductById(id: number): Observable<Product | undefined> {
-    const product = this.mockProducts.find(p => p.id === id);
-    return of(product).pipe(delay(200));
+  getProductById(id: number): Observable<Product> {
+    return this.http.get<Product>(`${environment.apiUrl}/Product/${id}`);
+  }
+
+  createProduct(product: CreateProductDto): Observable<Product> {
+  return this.http.post<Product>(`${environment.apiUrl}/Product`, product);
+}
+
+  updateProduct(id: number, product: UpdateProductDto): Observable<Product> {
+    return this.http.put<Product>(`${environment.apiUrl}/Product/${id}`, product);
+  }
+
+  deleteProduct(id: number): Observable<any> {
+    return this.http.delete(`${environment.apiUrl}/Product/${id}`);
   }
 }

@@ -1,35 +1,36 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, of } from 'rxjs';
-import { delay } from 'rxjs/operators';
-import { Order } from '../../models/order';
-import { OrderItem } from '../../models/order-item';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { Order } from 'src/app/models/order';
+import { environment } from 'src/environments/environments';
+import { CreateOrderDto, UpdateOrderStatusDto } from 'src/app/models/dto-models';
 
 @Injectable({ providedIn: 'root' })
 export class OrderService {
-  private ordersSubject = new BehaviorSubject<Order[]>([]);
-  public orders$ = this.ordersSubject.asObservable();
+  constructor(private http: HttpClient) {}
 
-  constructor() {
-    const stored = localStorage.getItem('orders');
-    if (stored) this.ordersSubject.next(JSON.parse(stored));
+  placeOrder(order: CreateOrderDto): Observable<Order> {
+    return this.http.post<Order>(`${environment.apiUrl}/Order`, order);
   }
 
-  placeOrder(order: Omit<Order, 'id' | 'createdAt' | 'status'>): Observable<Order> {
-    const newOrder: Order = {
-      id: Date.now(),
-      ...order,
-      status: 'Pending',
-      createdAt: new Date(),
-      items: order.items || []
-    };
-    const current = this.ordersSubject.value;
-    this.ordersSubject.next([...current, newOrder]);
-    localStorage.setItem('orders', JSON.stringify(this.ordersSubject.value));
-    return of(newOrder).pipe(delay(500));
+  getMyOrders(): Observable<Order[]> {
+    return this.http.get<Order[]>(`${environment.apiUrl}/Order`);
   }
 
-  getOrdersForUser(userId: number): Observable<Order[]> {
-    const userOrders = this.ordersSubject.value.filter(o => o.userId === userId);
-    return of(userOrders).pipe(delay(300));
+  getOrderById(id: number): Observable<Order> {
+    return this.http.get<Order>(`${environment.apiUrl}/Order/${id}`);
+  }
+
+  cancelOrder(id: number): Observable<any> {
+    return this.http.delete(`${environment.apiUrl}/Order/${id}`);
+  }
+
+  // Admin only
+  getAllOrders(): Observable<Order[]> {
+    return this.http.get<Order[]>(`${environment.apiUrl}/Order/admin/all`);
+  }
+
+  updateOrderStatus(id: number, dto: UpdateOrderStatusDto): Observable<any> {
+    return this.http.put(`${environment.apiUrl}/Order/${id}/status`, dto);
   }
 }

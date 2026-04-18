@@ -1,26 +1,48 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
   <div class="container-fluid">
     <a class="navbar-brand" routerLink="/">🍕 RetailOrder</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ms-auto">
+        <!-- Products – visible to everyone -->
         <li class="nav-item">
-          <a class="nav-link" routerLink="/products">Products</a>
+          <a class="nav-link" routerLink="/products" routerLinkActive="active">Products</a>
         </li>
-        <li class="nav-item" *ngIf="!isLoggedIn">
-          <a class="nav-link" routerLink="/login">Login</a>
-        </li>
-        <li class="nav-item" *ngIf="!isLoggedIn">
-          <a class="nav-link" routerLink="/register">Register</a>
-        </li>
-        <li class="nav-item" *ngIf="isLoggedIn">
-          <a class="nav-link" routerLink="/orders">Orders</a>
-        </li>
-        <li class="nav-item" *ngIf="isLoggedIn">
-          <a class="nav-link" routerLink="/cart">Cart <span class="badge bg-primary">{{cartItemCount}}</span></a>
-        </li>
+
+        <!-- Admin links (only when role is Admin) -->
+        <ng-container *ngIf="isLoggedIn && userRole === 'Admin'">
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/admin/dashboard" routerLinkActive="active">Dashboard</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/admin/products" routerLinkActive="active">Manage Products</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/admin/orders" routerLinkActive="active">Manage Orders</a>
+          </li>
+        </ng-container>
+
+        <!-- Customer links (only when logged in as Customer) -->
+        <ng-container *ngIf="isLoggedIn && userRole === 'Customer'">
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/orders" routerLinkActive="active">My Orders</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/cart" routerLinkActive="active">
+              Cart <span class="badge bg-primary">{{ cartItemCount }}</span>
+            </a>
+          </li>
+        </ng-container>
+
+        <!-- Not logged in -->
+        <ng-container *ngIf="!isLoggedIn">
+          <li class="nav-item"><a class="nav-link" routerLink="/login">Login</a></li>
+          <li class="nav-item"><a class="nav-link" routerLink="/register">Register</a></li>
+        </ng-container>
+
+        <!-- Logout button for both admin and customer -->
         <li class="nav-item" *ngIf="isLoggedIn">
           <button class="btn btn-outline-danger btn-sm" (click)="logout()">Logout</button>
         </li>

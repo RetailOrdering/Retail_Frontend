@@ -1,10 +1,13 @@
-<div class="container my-4">
-  <h2 class="mb-4">Our Products</h2>
-  <div *ngIf="(products$ | async)?.length === 0" class="alert alert-info text-center">
-    No products available at the moment.
+<div class="container">
+  <h2>Our Products</h2>
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status"></div>
   </div>
-  <div class="row g-4">
-    <div class="col-12 col-sm-6 col-md-4 col-lg-3" *ngFor="let product of products$ | async">
+  <div *ngIf="!loading && products.length === 0" class="alert alert-info text-center py-4">
+    No products available.
+  </div>
+  <div class="row g-4" *ngIf="!loading && products.length > 0">
+    <div class="col-12 col-sm-6 col-md-4 col-lg-3" *ngFor="let product of products">
       <app-product-card [product]="product"></app-product-card>
     </div>
   </div>
