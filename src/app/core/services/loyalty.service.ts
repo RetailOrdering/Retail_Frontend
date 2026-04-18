@@ -1,22 +1,23 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { delay } from 'rxjs/operators';
-import { LoyaltyPoint } from '../../models/user';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { environment } from 'src/environments/environments';
+import { LoyaltyPoint } from 'src/app/models/user';
+import { RedeemPointsRequest } from 'src/app/models/dto-models';
 
 @Injectable({ providedIn: 'root' })
 export class LoyaltyService {
-  private mockPoints: { [userId: number]: number } = {
-    1: 120,
-    2: 45
-  };
+  constructor(private http: HttpClient) {}
 
-  getPoints(userId: number): Observable<number> {
-    return of(this.mockPoints[userId] || 0).pipe(delay(200));
+  getPoints(): Observable<number> {
+    return this.http.get<number>(`${environment.apiUrl}/Loyalty/points`);
   }
 
-  addPoints(userId: number, points: number): Observable<void> {
-    if (!this.mockPoints[userId]) this.mockPoints[userId] = 0;
-    this.mockPoints[userId] += points;
-    return of(undefined).pipe(delay(200));
+  getHistory(): Observable<LoyaltyPoint[]> {
+    return this.http.get<LoyaltyPoint[]>(`${environment.apiUrl}/Loyalty/history`);
+  }
+
+  redeemPoints(request: RedeemPointsRequest): Observable<any> {
+    return this.http.post(`${environment.apiUrl}/Loyalty/redeem`, request);
   }
 }

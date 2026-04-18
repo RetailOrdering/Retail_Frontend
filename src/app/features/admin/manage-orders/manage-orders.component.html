@@ -1,1 +1,68 @@
-<p>manage-orders works!</p>
+<div class="container-fluid">
+  <h2 class="mb-4">All Orders</h2>
+  <div *ngIf="loading" class="text-center py-5"><div class="spinner-border text-primary"></div></div>
+  <div class="table-responsive" *ngIf="!loading">
+    <table class="table table-hover">
+      <thead class="table-dark">
+        <tr>
+          <th>Order ID</th>
+          <th>User ID</th>
+          <th>Total</th>
+          <th>Status</th>
+          <th>Date</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let order of orders">
+          <td>{{ order.id }}</td>
+          <td>{{ order.userId }}</td>
+          <td>{{ order.totalAmount | currency:'INR' }}</td>
+          <td>
+            <select class="form-select form-select-sm" [(ngModel)]="order.status" (change)="updateStatus(order)">
+              <option value="Pending">Pending</option>
+              <option value="Confirmed">Confirmed</option>
+              <option value="Delivered">Delivered</option>
+              <option value="Cancelled">Cancelled</option>
+            </select>
+          </td>
+          <td>{{ order.createdAt | date:'medium' }}</td>
+          <td>
+            <button class="btn btn-sm btn-info" (click)="viewDetails(order)">Details</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Order Details Modal -->
+<div class="modal fade" id="orderDetailModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Order #{{ selectedOrder?.id }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p><strong>User ID:</strong> {{ selectedOrder?.userId }}</p>
+        <p><strong>Address:</strong> {{ selectedOrder?.address }}</p>
+        <p><strong>Payment:</strong> {{ selectedOrder?.paymentMethod }}</p>
+        <p><strong>Total:</strong> {{ selectedOrder?.totalAmount | currency:'INR' }}</p>
+        <hr>
+        <h6>Items</h6>
+        <table class="table table-sm">
+          <thead><tr><th>Product</th><th>Qty</th><th>Price</th><th>Total</th></tr></thead>
+          <tbody>
+            <tr *ngFor="let item of selectedOrder?.items">
+              <td>{{ item.product?.name || ('Product #'+item.productId) }}</td>
+              <td>{{ item.quantity }}</td>
+              <td>{{ item.price | currency:'INR' }}</td>
+              <td>{{ item.price * item.quantity | currency:'INR' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

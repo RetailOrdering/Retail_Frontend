@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
-import { CartService } from 'src/app/core/services/cart.service';
-import { CartItem } from 'src/app/models/cart-item';
+import { CartItem } from '../../../models/cart-item';
+import { CartService } from '../../../core/services/cart.service';
 
 @Component({
   selector: 'app-cart-page',
@@ -9,28 +8,28 @@ import { CartItem } from 'src/app/models/cart-item';
   styleUrls: ['./cart-page.component.css']
 })
 export class CartPageComponent implements OnInit {
-  cartItems$!: Observable<CartItem[]>;
+  cartItems: CartItem[] = [];
+  loading = true;
 
   constructor(private cartService: CartService) {}
 
   ngOnInit(): void {
-    this.cartItems$ = this.cartService.cartItems$;
+    this.cartService.cartItems$.subscribe(items => {
+      this.cartItems = items;
+      this.loading = false;
+    });
   }
 
-  removeItem(productId: number): void {
-    this.cartService.removeFromCart(productId);
+  removeItem(itemId: number): void {
+    this.cartService.removeFromCart(itemId).subscribe();
   }
 
-  updateQuantity(productId: number, quantity: number): void {
+  updateQuantity(itemId: number, quantity: number): void {
     if (quantity < 1) return;
-    this.cartService.updateQuantity(productId, quantity);
+    this.cartService.updateQuantity(itemId, { quantity }).subscribe();
   }
 
   getTotal(): number {
-    let total = 0;
-    this.cartService.cartItems$.subscribe((items: any[]) => {
-      total = items.reduce((sum, i) => sum + (i.price * i.quantity), 0);
-    });
-    return total;
+    return this.cartItems.reduce((sum, i) => sum + (i.price * i.quantity), 0);
   }
 }

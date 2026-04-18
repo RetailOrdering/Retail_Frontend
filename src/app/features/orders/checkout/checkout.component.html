@@ -1,1 +1,67 @@
-<p>checkout works!</p>
+<div class="container" style="max-width: 900px;">
+  <h2>Checkout</h2>
+  <div class="row g-4">
+    <div class="col-md-7">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+          <h5 class="card-title fw-semibold mb-3">Delivery Details</h5>
+          <form #checkoutForm="ngForm" (ngSubmit)="placeOrder()">
+            <div class="mb-3">
+              <label class="form-label">Full name</label>
+              <input type="text" class="form-control" [(ngModel)]="address.name" name="name" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Address</label>
+              <textarea rows="3" class="form-control" [(ngModel)]="address.line" name="address" required></textarea>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Payment method</label>
+              <select class="form-select" [(ngModel)]="paymentMethod" name="payment">
+                <option>Cash on Delivery</option>
+                <option>Credit Card</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Coupon Code</label>
+              <div class="input-group">
+                <input type="text" class="form-control" [(ngModel)]="couponCode" name="coupon">
+                <button class="btn btn-outline-secondary" type="button" (click)="applyCoupon()">Apply</button>
+              </div>
+              <small *ngIf="couponValid" class="text-success">Coupon applied: {{ discountPercent }}% off</small>
+            </div>
+            <button type="submit" class="btn btn-primary w-100 py-2" [disabled]="placingOrder">
+              {{ placingOrder ? 'Placing order...' : 'Place Order' }}
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-5">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-0 pt-3">
+          <h5 class="mb-0">Order Summary</h5>
+        </div>
+        <div class="card-body">
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item d-flex justify-content-between px-0">
+              <span>Subtotal</span>
+              <strong>{{ subtotal | currency }}</strong>
+            </li>
+            <li class="list-group-item d-flex justify-content-between px-0" *ngIf="discountAmount > 0">
+              <span>Discount</span>
+              <span class="text-success">-{{ discountAmount | currency }}</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between px-0">
+              <span>Delivery</span>
+              <span class="text-success">Free</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between fw-bold px-0 fs-5">
+              <span>Total</span>
+              <span>{{ total | currency }}</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

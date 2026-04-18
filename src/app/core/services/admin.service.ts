@@ -1,19 +1,28 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { delay } from 'rxjs/operators';
-import { Product } from '../../models/product';
-import { Order } from '../../models/order';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { environment } from 'src/environments/environments';
+import { User } from 'src/app/models/user';
+import { UpdateRoleRequest } from 'src/app/models/dto-models';
+import { Product } from 'src/app/models/product';
 
 @Injectable({ providedIn: 'root' })
 export class AdminService {
-  updateProduct(product: Product): Observable<Product> {
-    console.log('Mock update product', product);
-    return of(product).pipe(delay(400));
+  constructor(private http: HttpClient) {}
+
+  getDashboard(): Observable<any> {
+    return this.http.get(`${environment.apiUrl}/Admin/dashboard`);
   }
 
-  getAllOrders(): Observable<Order[]> {
-    const stored = localStorage.getItem('orders');
-    const orders = stored ? JSON.parse(stored) : [];
-    return of(orders).pipe(delay(300));
+  getAllUsers(): Observable<User[]> {
+    return this.http.get<User[]>(`${environment.apiUrl}/Admin/users`);
+  }
+
+  updateUserRole(userId: number, body: UpdateRoleRequest): Observable<any> {
+    return this.http.put(`${environment.apiUrl}/Admin/users/${userId}/role`, body);
+  }
+
+  getLowStockProducts(): Observable<Product[]> {
+    return this.http.get<Product[]>(`${environment.apiUrl}/Admin/low-stock`);
   }
 }

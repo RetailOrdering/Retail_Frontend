@@ -1,45 +1,34 @@
-<div class="container my-4">
+<div class="container">
   <h2>Shopping Cart</h2>
-  <div *ngIf="(cartItems$ | async)?.length === 0" class="alert alert-info">
-    Your cart is empty. <a routerLink="/products">Continue shopping</a>
+  <div *ngIf="loading" class="text-center py-5"><div class="spinner-border text-primary"></div></div>
+  <div *ngIf="!loading && cartItems.length === 0" class="alert alert-info text-center py-4">
+    Your cart is empty. <a routerLink="/products" class="alert-link">Start shopping</a>
   </div>
-  <div *ngIf="(cartItems$ | async)?.length! > 0">
+  <div *ngIf="!loading && cartItems.length > 0">
     <div class="table-responsive">
-      <table class="table table-bordered align-middle">
-        <thead class="table-dark">
-          <tr>
-            <th>Product</th>
-            <th>Price</th>
-            <th>Quantity</th>
-            <th>Total</th>
-            <th>Action</th>
-          </tr>
+      <table class="table table-hover align-middle">
+        <thead class="table-light">
+          <tr><th>Product</th><th>Price</th><th>Quantity</th><th>Total</th><th></th></tr>
         </thead>
         <tbody>
-          <tr *ngFor="let item of cartItems$ | async">
-            <td>{{item.productName}}</td>
-            <td>{{item.price | currency}}</td>
-            <td>
-              <input type="number" class="form-control form-control-sm" style="width: 80px;" [(ngModel)]="item.quantity" (change)="updateQuantity(item.productId, item.quantity)" min="1">
+          <tr *ngFor="let item of cartItems">
+            <td>{{ item.productName || ('Product #'+item.productId) }}</td>
+            <td>{{ item.price | currency }}</td>
+            <td style="width: 110px;">
+              <input type="number" class="form-control form-control-sm" [(ngModel)]="item.quantity" (change)="updateQuantity(item.id, item.quantity)" min="1">
             </td>
-            <td>{{item.price * item.quantity | currency}}</td>
-            <td>
-              <button class="btn btn-danger btn-sm" (click)="removeItem(item.productId)">Remove</button>
-            </td>
+            <td>{{ item.price * item.quantity | currency }}</td>
+            <td><button class="btn btn-sm btn-link text-danger" (click)="removeItem(item.id)"><i class="bi bi-trash"></i></button></td>
           </tr>
         </tbody>
         <tfoot class="table-light">
-          <tr>
-            <th colspan="3" class="text-end">Total:</th>
-            <th>{{getTotal() | currency}}</th>
-            <th></th>
-          </tr>
+          <tr><th colspan="3" class="text-end">Total</th><th colspan="2">{{ getTotal() | currency }}</th></tr>
         </tfoot>
       </table>
     </div>
-    <div class="d-flex justify-content-between">
-      <button class="btn btn-secondary" routerLink="/products">Continue Shopping</button>
-      <button class="btn btn-success" routerLink="/checkout">Proceed to Checkout</button>
+    <div class="d-flex justify-content-between mt-4">
+      <a routerLink="/products" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i> Continue Shopping</a>
+      <a routerLink="/checkout" class="btn btn-success px-4">Proceed to Checkout <i class="bi bi-arrow-right ms-1"></i></a>
     </div>
   </div>
 </div>

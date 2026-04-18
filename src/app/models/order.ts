@@ -7,8 +7,9 @@ export interface Order {
   status: 'Pending' | 'Confirmed' | 'Delivered' | 'Cancelled';
   createdAt: Date;
   address: string;
-  paymentMethod: string;  // 'COD', 'Card', etc.
+  paymentMethod: string;
   couponCode?: string;
   discountAmount: number;
+  updatedAt?: Date;
   items: OrderItem[];
 }

@@ -5,4 +5,6 @@ export interface Coupon {
   expiryDate: Date;
   isActive: boolean;
   minimumOrderAmount: number;
+  createdAt: Date;
+  lastUpdated?: Date;
 }
