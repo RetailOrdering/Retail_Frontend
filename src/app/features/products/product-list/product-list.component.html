@@ -1,14 +1,56 @@
-<div class="container">
-  <h2>Our Products</h2>
-  <div *ngIf="loading" class="text-center py-5">
-    <div class="spinner-border text-primary" role="status"></div>
-  </div>
-  <div *ngIf="!loading && products.length === 0" class="alert alert-info text-center py-4">
-    No products available.
-  </div>
-  <div class="row g-4" *ngIf="!loading && products.length > 0">
-    <div class="col-12 col-sm-6 col-md-4 col-lg-3" *ngFor="let product of products">
-      <app-product-card [product]="product"></app-product-card>
+<div class="product-list-page">
+  <div class="container">
+    <!-- Hero / Header -->
+    <div class="page-header">
+      <h1>✨ Our Collection</h1>
+      <p>Discover the finest products curated just for you</p>
+    </div>
+
+    <!-- Filters & Search Bar -->
+    <div class="filters-bar">
+      <div class="search-wrapper">
+        <span class="search-icon">🔍</span>
+        <input 
+          type="text" 
+          placeholder="Search products..." 
+          [(ngModel)]="searchTerm" 
+          (input)="applyFilters()"
+          class="search-input"
+        />
+      </div>
+      <div class="category-filter">
+        <select (change)="onCategoryChange($event)" class="category-select">
+          <option value="">All Categories</option>
+          <option *ngFor="let cat of categories" [value]="cat.id">{{ cat.name }}</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div *ngIf="loading" class="loader-wrapper">
+      <div class="loader"></div>
+      <p>Loading amazing products...</p>
+    </div>
+
+    <!-- Error Message -->
+    <div *ngIf="error" class="error-message">
+      ⚠️ {{ error }}
+      <button class="btn btn-outline" (click)="loadProducts()">Retry</button>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!loading && !error && filteredProducts.length === 0" class="empty-state">
+      <div class="empty-icon">🛍️</div>
+      <h3>No products found</h3>
+      <p>Try adjusting your search or category filter.</p>
+    </div>
+
+    <!-- Product Grid -->
+    <div class="products-grid" *ngIf="!loading && !error && filteredProducts.length > 0">
+      <app-product-card 
+        *ngFor="let product of filteredProducts" 
+        [product]="product"
+      ></app-product-card>
     </div>
   </div>
 </div>

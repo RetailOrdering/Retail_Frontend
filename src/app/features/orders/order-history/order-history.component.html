@@ -1,35 +1,57 @@
-<div class="container">
-  <h2>My Orders</h2>
-  <div *ngIf="loading" class="text-center py-5"><div class="spinner-border text-primary"></div></div>
-  <div *ngIf="!loading && orders.length === 0" class="alert alert-info text-center py-4">
-    You haven't placed any orders yet. <a routerLink="/products">Shop now</a>
-  </div>
-  <div class="row g-3" *ngIf="!loading && orders.length > 0">
-    <div class="col-12" *ngFor="let order of orders">
-      <div class="card border-0 shadow-sm">
-        <div class="card-header bg-white d-flex justify-content-between flex-wrap align-items-center">
-          <div><span class="fw-semibold">Order #{{ order.id }}</span><span class="text-muted ms-2 small">{{ order.createdAt | date }}</span></div>
-          <span class="badge" [ngClass]="{
-            'bg-warning text-dark': order.status === 'Pending',
-            'bg-success': order.status === 'Confirmed',
-            'bg-info': order.status === 'Delivered',
-            'bg-danger': order.status === 'Cancelled'
-          }">{{ order.status }}</span>
+<div class="order-history-page">
+  <div class="container">
+    <h1>My Orders</h1>
+
+    <!-- Loading -->
+    <div *ngIf="loading" class="loader-wrapper">
+      <div class="loader"></div>
+      <p>Loading your orders...</p>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="error" class="error-message">
+      ⚠️ {{ error }}
+      <button class="btn btn-outline" (click)="loadOrders()">Retry</button>
+    </div>
+
+    <!-- Empty -->
+    <div *ngIf="!loading && !error && orders.length === 0" class="empty-orders">
+      <div class="empty-icon">📦</div>
+      <h2>No orders yet</h2>
+      <p>Looks like you haven't placed any orders.</p>
+      <button class="btn btn-primary" routerLink="/products">Start Shopping</button>
+    </div>
+
+    <!-- Orders list -->
+    <div *ngIf="!loading && !error && orders.length > 0" class="orders-list">
+      <div class="order-card" *ngFor="let order of orders">
+        <div class="order-header">
+          <div class="order-id">
+            Order #{{ order.id }}
+            <span class="order-date">{{ order.createdAt | date:'medium' }}</span>
+          </div>
+          <div class="order-status" [class]="getStatusClass(order.status)">
+            {{ order.status }}
+          </div>
         </div>
-        <div class="card-body">
-          <div class="table-responsive">
-            <table class="table table-sm mb-0">
-              <thead><tr><th>Product</th><th>Qty</th><th>Price</th><th>Total</th></tr></thead>
-              <tbody>
-                <tr *ngFor="let item of order.items">
-                  <td>{{ item.product?.name || ('Product #'+item.productId) }}</td>
-                  <td>{{ item.quantity }}</td>
-                  <td>{{ item.price | currency }}</td>
-                  <td>{{ item.price * item.quantity | currency }}</td>
-                </tr>
-              </tbody>
-              <tfoot><tr><th colspan="3" class="text-end">Grand Total</th><th>{{ order.totalAmount | currency }}</th></tr></tfoot>
-            </table>
+
+        <div class="order-items">
+          <div class="order-item" *ngFor="let item of order.items">
+            <span>{{ item.productName || 'Product #' + item.productId }} x {{ item.quantity }}</span>
+            <span>₹{{ (item.price * item.quantity) | number:'1.2-2' }}</span>
+          </div>
+        </div>
+
+        <div class="order-footer">
+          <div class="order-total">
+            <span>Total:</span>
+            <strong>₹{{ order.totalAmount | number:'1.2-2' }}</strong>
+          </div>
+          <div class="order-actions">
+            <button class="btn btn-outline" (click)="viewOrder(order.id)">View Details</button>
+            <button *ngIf="order.status === 'Pending'" class="btn btn-danger" (click)="cancelOrder(order.id)">
+              Cancel Order
+            </button>
           </div>
         </div>
       </div>

@@ -1,21 +1,166 @@
-/* Force horizontal layout on large screens (Bootstrap already does, but enforce) */
-@media (min-width: 992px) {
-  .navbar-nav {
-    align-items: center;
-  }
-  .nav-item {
-    margin-left: 0.25rem;
-  }
+.navbar {
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(12px);
+  box-shadow: var(--shadow);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
-.nav-link.active {
-  color: #f97316 !important;
-  font-weight: 600;
+
+.nav-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 70px;
 }
-.nav-link {
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-decoration: none;
+  color: var(--primary);
+}
+.logo span {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.nav-links {
+  display: flex;
+  gap: 2rem;
+}
+.nav-links a {
+  text-decoration: none;
+  color: var(--gray-700);
   font-weight: 500;
-  color: #334155;
   transition: color 0.2s;
 }
-.nav-link:hover {
-  color: #f97316;
+.nav-links a:hover,
+.nav-links a.active {
+  color: var(--primary);
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.cart-btn {
+  position: relative;
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: background 0.2s;
+}
+.cart-btn:hover {
+  background: var(--gray-100);
+}
+.cart-count {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: var(--secondary);
+  color: white;
+  font-size: 0.7rem;
+  font-weight: bold;
+  padding: 0.15rem 0.45rem;
+  border-radius: 20px;
+}
+
+.user-avatar {
+  width: 36px;
+  height: 36px;
+  background: var(--primary-light);
+  border: none;
+  border-radius: 50%;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.user-avatar:hover {
+  transform: scale(1.05);
+}
+
+.user-menu {
+  position: relative;
+}
+.dropdown {
+  position: absolute;
+  top: 45px;
+  right: 0;
+  background: white;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-lg);
+  min-width: 180px;
+  padding: 0.5rem 0;
+  z-index: 10;
+}
+.dropdown-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.5rem 1rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+.dropdown-item:hover {
+  background: var(--gray-100);
+}
+.user-name {
+  padding: 0.5rem 1rem 0.25rem;
+  font-weight: 600;
+  border-bottom: 1px solid var(--gray-200);
+}
+.user-role {
+  padding: 0 1rem 0.5rem;
+  font-size: 0.7rem;
+  color: var(--gray-500);
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.auth-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.mobile-toggle {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .nav-links {
+    position: fixed;
+    top: 70px;
+    left: -100%;
+    flex-direction: column;
+    background: white;
+    width: 80%;
+    height: calc(100vh - 70px);
+    padding: 2rem;
+    transition: 0.3s;
+    box-shadow: var(--shadow-lg);
+  }
+  .nav-links.open {
+    left: 0;
+  }
+  .mobile-toggle {
+    display: block;
+  }
+  .auth-buttons {
+    flex-direction: column;
+  }
 }

@@ -1,37 +1,48 @@
-<div class="container-fluid">
-  <h1 class="h2 mb-4">Admin Dashboard</h1>
-  <div class="row g-4">
-    <div class="col-md-3">
-      <div class="card text-center p-3 shadow-sm">
-        <i class="bi bi-box-seam fs-1 text-primary"></i>
-        <h3 class="mt-2">{{ totalProducts }}</h3>
-        <p class="text-muted">Total Products</p>
+<div class="admin-dashboard">
+  <div class="container">
+    <h1>Admin Dashboard</h1>
+
+    <div *ngIf="loading" class="loader-wrapper"><div class="loader"></div><p>Loading...</p></div>
+    <div *ngIf="error" class="error-message">{{ error }} <button class="btn btn-outline" (click)="loadDashboard()">Retry</button></div>
+
+    <div *ngIf="!loading && !error && dashboardData">
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-icon">📦</div><div><h3>Total Orders</h3><p>{{ dashboardData.totalOrders || 0 }}</p></div></div>
+        <div class="stat-card"><div class="stat-icon">💰</div><div><h3>Revenue</h3><p>₹{{ (dashboardData.totalRevenue || 0) | number:'1.2-2' }}</p></div></div>
+        <div class="stat-card"><div class="stat-icon">👥</div><div><h3>Users</h3><p>{{ dashboardData.totalUsers || 0 }}</p></div></div>
+        <div class="stat-card"><div class="stat-icon">⚠️</div><div><h3>Low Stock</h3><p>{{ dashboardData.lowStockCount || 0 }}</p></div></div>
+      </div>
+
+      <div class="action-buttons">
+        <button class="btn btn-outline" (click)="loadUsers()">📋 Manage Users</button>
+        <button class="btn btn-outline" (click)="loadLowStock()">📦 Low Stock Products</button>
+      </div>
+
+      <!-- Users List -->
+      <div *ngIf="showUsers" class="users-section">
+        <h2>Users</h2>
+        <table class="data-table">
+          <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Role</th><th>Action</th></tr></thead>
+          <tbody>
+            <tr *ngFor="let user of users">
+              <td>{{ user.id }}</td><td>{{ user.name }}</td><td>{{ user.email }}</td>
+              <td><select [(ngModel)]="user.role" (change)="updateUserRole(user.id, user.role)"><option value="Customer">Customer</option><option value="Admin">Admin</option></select></td>
+              <td><button class="btn-sm btn-primary" (click)="updateUserRole(user.id, user.role)">Update</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Low Stock Products -->
+      <div *ngIf="showLowStock" class="lowstock-section">
+        <h2>Low Stock Products (≤5)</h2>
+        <table class="data-table">
+          <thead><tr><th>ID</th><th>Name</th><th>Stock</th><th>Brand</th></tr></thead>
+          <tbody>
+            <tr *ngFor="let p of lowStockProducts"><td>{{ p.id }}</td><td>{{ p.name }}</td><td class="warning">{{ p.stock }}</td><td>{{ p.brand }}</td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
-    <div class="col-md-3">
-      <div class="card text-center p-3 shadow-sm">
-        <i class="bi bi-cart-check fs-1 text-success"></i>
-        <h3 class="mt-2">{{ totalOrders }}</h3>
-        <p class="text-muted">Total Orders</p>
-      </div>
-    </div>
-    <div class="col-md-3">
-      <div class="card text-center p-3 shadow-sm">
-        <i class="bi bi-people fs-1 text-info"></i>
-        <h3 class="mt-2">{{ totalUsers }}</h3>
-        <p class="text-muted">Total Users</p>
-      </div>
-    </div>
-    <div class="col-md-3">
-      <div class="card text-center p-3 shadow-sm">
-        <i class="bi bi-exclamation-triangle fs-1 text-warning"></i>
-        <h3 class="mt-2">{{ lowStockCount }}</h3>
-        <p class="text-muted">Low Stock (<10)</p>
-      </div>
-    </div>
-  </div>
-  <div class="mt-4">
-    <a routerLink="/admin/products" class="btn btn-outline-primary me-2">Manage Products</a>
-    <a routerLink="/admin/orders" class="btn btn-outline-secondary">Manage Orders</a>
   </div>
 </div>

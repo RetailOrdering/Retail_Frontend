@@ -1,5 +1,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';   // ✅ Add this import
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -10,6 +12,7 @@ import { ProductDetailComponent } from './features/products/product-detail/produ
 import { CartPageComponent } from './features/cart/cart-page/cart-page.component';
 import { CheckoutComponent } from './features/orders/checkout/checkout.component';
 import { OrderHistoryComponent } from './features/orders/order-history/order-history.component';
+import { OrderDetailComponent } from './features/orders/order-detail/order-detail.component';
 import { DashboardComponent } from './features/admin/dashboard/dashboard.component';
 import { ManageProductsComponent } from './features/admin/manage-products/manage-products.component';
 import { ManageOrdersComponent } from './features/admin/manage-orders/manage-orders.component';
@@ -17,8 +20,6 @@ import { NavbarComponent } from './shared/components/navbar/navbar.component';
 import { FooterComponent } from './shared/components/footer/footer.component';
 import { ProductCardComponent } from './shared/components/product-card/product-card.component';
 import { LoaderComponent } from './shared/components/loader/loader.component';
-import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
-import { FormsModule } from '@angular/forms';
 import { AuthInterceptor } from './core/interceptors/auth.interceptor';
 
 @NgModule({
@@ -31,6 +32,7 @@ import { AuthInterceptor } from './core/interceptors/auth.interceptor';
     CartPageComponent,
     CheckoutComponent,
     OrderHistoryComponent,
+    OrderDetailComponent,
     DashboardComponent,
     ManageProductsComponent,
     ManageOrdersComponent,
@@ -43,10 +45,11 @@ import { AuthInterceptor } from './core/interceptors/auth.interceptor';
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
-    FormsModule
+    FormsModule,           // for ngModel
+    ReactiveFormsModule    // ✅ for formGroup, formControlName
   ],
   providers: [
-     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }
   ],
   bootstrap: [AppComponent]
 })

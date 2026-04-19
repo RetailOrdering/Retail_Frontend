@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { Order } from '../../../models/order';
 import { OrderService } from '../../../core/services/order.service';
-import { Modal } from 'bootstrap';
+import { Order } from '../../../models/order';
 
 @Component({
   selector: 'app-manage-orders',
@@ -10,8 +9,9 @@ import { Modal } from 'bootstrap';
 })
 export class ManageOrdersComponent implements OnInit {
   orders: Order[] = [];
-  loading = true;
-  selectedOrder: Order | null = null;
+  loading = false;
+  error = '';
+  statusOptions = ['Pending', 'Confirmed', 'Delivered', 'Cancelled'];
 
   constructor(private orderService: OrderService) {}
 
@@ -20,23 +20,27 @@ export class ManageOrdersComponent implements OnInit {
   }
 
   loadOrders(): void {
+    this.loading = true;
     this.orderService.getAllOrders().subscribe({
-      next: (data) => {
-        this.orders = data;
-        this.loading = false;
-      },
-      error: () => this.loading = false
+      next: (data) => { this.orders = data; this.loading = false; },
+      error: (err) => { this.error = 'Failed to load orders'; this.loading = false; }
     });
   }
 
-  updateStatus(order: Order): void {
-    this.orderService.updateOrderStatus(order.id, { status: order.status }).subscribe();
+  updateStatus(orderId: number, newStatus: string): void {
+    this.orderService.updateOrderStatus(orderId, { status: newStatus }).subscribe({
+      next: () => { this.loadOrders(); alert('Status updated'); },
+      error: (err) => alert('Update failed')
+    });
   }
 
-  viewDetails(order: Order): void {
-    this.selectedOrder = order;
-    const modalElem = document.getElementById('orderDetailModal');
-    const modal = new Modal(modalElem!);
-    modal.show();
+  getStatusClass(status: string): string {
+    switch (status?.toLowerCase()) {
+      case 'pending': return 'badge-pending';
+      case 'confirmed': return 'badge-confirmed';
+      case 'delivered': return 'badge-delivered';
+      case 'cancelled': return 'badge-cancelled';
+      default: return '';
+    }
   }
 }
