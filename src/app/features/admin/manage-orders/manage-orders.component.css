@@ -1,11 +1,25 @@
-.manage-orders { padding: 2rem 0 4rem; background: var(--gray-50); }
-.container { max-width: 1280px; margin: 0 auto; padding: 0 1.5rem; }
-h1 { margin-bottom: 2rem; }
-.data-table { width: 100%; background: white; border-radius: var(--radius); border-collapse: collapse; overflow-x: auto; display: block; }
+.manage-page {
+  padding: 2rem 0 4rem;
+  background: var(--gray-50);
+  min-height: 80vh;
+}
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+h1 { font-size: 2rem; color: var(--gray-900); }
+.loader-wrapper, .empty-state { text-align: center; padding: 4rem; }
+.error-message { background: rgba(239,68,68,0.08); border-left: 4px solid var(--danger); padding: 1rem; margin-bottom: 1rem; display: flex; justify-content: space-between; }
+.table-responsive { overflow-x: auto; background: white; border-radius: var(--radius-lg); border: 1px solid var(--gray-200); padding: 1rem; }
+.data-table { width: 100%; border-collapse: collapse; }
 .data-table th, .data-table td { padding: 0.75rem; text-align: left; border-bottom: 1px solid var(--gray-200); }
-.badge { padding: 0.25rem 0.75rem; border-radius: 2rem; font-size: 0.8rem; font-weight: 600; }
-.badge-pending { background: #fef3c7; color: #d97706; }
-.badge-confirmed { background: #dbeafe; color: #2563eb; }
-.badge-delivered { background: #d1fae5; color: #059669; }
-.badge-cancelled { background: #fee2e2; color: #dc2626; }
-select { padding: 0.25rem; border-radius: var(--radius-sm); border: 1px solid var(--gray-300); }
+.data-table th { background: var(--gray-50); font-weight: 600; }
+.status-select { padding: 0.25rem 0.5rem; border-radius: var(--radius-sm); border: 1px solid var(--gray-200); }
+.btn-sm { padding: 0.25rem 0.75rem; font-size: 0.8rem; }

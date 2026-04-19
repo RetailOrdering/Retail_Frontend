@@ -1,20 +1,33 @@
-<div class="manage-orders">
+<div class="manage-page">
   <div class="container">
-    <h1>Manage Orders</h1>
-    <div *ngIf="loading" class="loader-wrapper"><div class="loader"></div></div>
-    <div *ngIf="error" class="error-message">{{ error }}</div>
-    <div *ngIf="!loading && !error">
+    <div class="page-header">
+      <h1>Manage Orders</h1>
+    </div>
+
+    <div *ngIf="loading" class="loader-wrapper"><div class="loader"></div><p>Loading orders...</p></div>
+    <div *ngIf="error" class="error-message">{{ error }} <button class="btn btn-outline" (click)="loadOrders()">Retry</button></div>
+
+    <div *ngIf="!loading && !error && orders.length === 0" class="empty-state">No orders found.</div>
+
+    <div *ngIf="!loading && !error && orders.length > 0" class="table-responsive">
       <table class="data-table">
-        <thead><tr><th>Order ID</th><th>User ID</th><th>Date</th><th>Total</th><th>Status</th><th>Action</th></tr></thead>
+        <thead>
+          <tr><th>Order ID</th><th>Customer</th><th>Total</th><th>Status</th><th>Date</th><th>Action</th></tr>
+        </thead>
         <tbody>
           <tr *ngFor="let order of orders">
-            <td>{{ order.id }}</td><td>{{ order.userId }}</td><td>{{ order.createdAt | date:'short' }}</td><td>₹{{ order.totalAmount }}</td>
-            <td><span class="badge" [class]="getStatusClass(order.status)">{{ order.status }}</span></td>
+            <td>#{{ order.id }}</td>
+            <td>₹{{ order.totalAmount | number:'1.2-2' }}</td>
             <td>
-              <select [(ngModel)]="order.status" (change)="updateStatus(order.id, order.status)">
-                <option *ngFor="let s of statusOptions" [value]="s">{{ s }}</option>
+              <select [(ngModel)]="order.status" (change)="updateStatus(order.id, order.status)" class="status-select">
+                <option value="Pending">Pending</option>
+                <option value="Confirmed">Confirmed</option>
+                <option value="Delivered">Delivered</option>
+                <option value="Cancelled">Cancelled</option>
               </select>
             </td>
+            <td>{{ order.createdAt | date:'short' }}</td>
+            <td><button class="btn btn-sm btn-outline" (click)="viewOrder(order.id)">View</button></td>
           </tr>
         </tbody>
       </table>

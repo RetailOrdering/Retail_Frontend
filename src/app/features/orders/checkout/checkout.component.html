@@ -2,14 +2,13 @@
   <div class="container">
     <h1>Checkout</h1>
 
-    <!-- Loading state -->
     <div *ngIf="loading" class="loader-wrapper">
       <div class="loader"></div>
-      <p>Processing your order...</p>
+      <p>Loading your order summary...</p>
     </div>
 
     <div *ngIf="!loading" class="checkout-content">
-      <!-- Order Summary (Left or Top on mobile) -->
+      <!-- Order Summary -->
       <div class="order-summary">
         <h2>Order Summary</h2>
         <div class="summary-items">
@@ -31,7 +30,6 @@
           <span>₹{{ total | number:'1.2-2' }}</span>
         </div>
 
-        <!-- Loyalty Points Section -->
         <div class="loyalty-section" *ngIf="loyaltyPoints > 0">
           <p>You have <strong>{{ loyaltyPoints }}</strong> loyalty points</p>
           <div class="redeem-points">
@@ -46,7 +44,7 @@
         </div>
       </div>
 
-      <!-- Checkout Form (Right or Bottom) -->
+      <!-- Shipping Form -->
       <div class="checkout-form">
         <h2>Shipping Information</h2>
         <form #checkoutForm="ngForm" (ngSubmit)="placeOrder()">

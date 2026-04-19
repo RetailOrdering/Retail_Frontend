@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { OrderService } from '../../../core/services/order.service';
 import { Order } from '../../../models/order';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-order-history',
@@ -34,6 +35,12 @@ export class OrderHistoryComponent implements OnInit {
         console.error(err);
         this.error = 'Failed to load orders. Please try again.';
         this.loading = false;
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Could not load orders.',
+          confirmButtonColor: '#4F46E5'
+        });
       }
     });
   }
@@ -53,17 +60,39 @@ export class OrderHistoryComponent implements OnInit {
   }
 
   cancelOrder(orderId: number): void {
-    if (confirm('Are you sure you want to cancel this order?')) {
-      this.orderService.cancelOrder(orderId).subscribe({
-        next: () => {
-          alert('Order cancelled successfully');
-          this.loadOrders(); // refresh list
-        },
-        error: (err) => {
-          console.error(err);
-          alert('Failed to cancel order');
-        }
-      });
-    }
+    Swal.fire({
+      title: 'Cancel Order?',
+      text: 'This action cannot be undone.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#EF4444',
+      cancelButtonColor: '#6B7280',
+      confirmButtonText: 'Yes, cancel it',
+      cancelButtonText: 'No, keep it'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.orderService.cancelOrder(orderId).subscribe({
+          next: () => {
+            Swal.fire({
+              icon: 'success',
+              title: 'Cancelled',
+              text: 'Order cancelled successfully.',
+              timer: 2000,
+              showConfirmButton: false
+            });
+            this.loadOrders();
+          },
+          error: (err) => {
+            console.error(err);
+            Swal.fire({
+              icon: 'error',
+              title: 'Failed',
+              text: 'Could not cancel order.',
+              confirmButtonColor: '#4F46E5'
+            });
+          }
+        });
+      }
+    });
   }
 }

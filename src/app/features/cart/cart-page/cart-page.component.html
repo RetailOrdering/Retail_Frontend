@@ -2,13 +2,13 @@
   <div class="container">
     <h1>Your Shopping Cart</h1>
 
-    <!-- Loading state -->
+    <!-- Loading -->
     <div *ngIf="loading" class="loader-wrapper">
       <div class="loader"></div>
       <p>Loading your cart...</p>
     </div>
 
-    <!-- Error state -->
+    <!-- Error -->
     <div *ngIf="error" class="error-message">
       ⚠️ {{ error }}
       <button class="btn btn-outline" (click)="loadCart()">Retry</button>
@@ -40,7 +40,6 @@
             </div>
             <div class="item-details">
               <h3>{{ item.productName || 'Product #' + item.productId }}</h3>
-              <p class="item-meta">ID: {{ item.productId }}</p>
             </div>
           </div>
           <div class="item-price">₹{{ item.price | number:'1.2-2' }}</div>
@@ -55,15 +54,13 @@
           </div>
         </div>
 
-        <!-- Clear cart button -->
         <div class="cart-actions">
           <button class="btn btn-outline" (click)="clearCart()" [disabled]="clearingCart">
-            🧹 Clear Cart
+            Clear Cart
           </button>
         </div>
       </div>
 
-      <!-- Order summary sidebar -->
       <div class="order-summary">
         <h2>Order Summary</h2>
         <div class="summary-row">
@@ -79,13 +76,12 @@
           <span>₹{{ total | number:'1.2-2' }}</span>
         </div>
 
-        <!-- Coupon input -->
         <div class="coupon-section">
           <input type="text" [(ngModel)]="couponCode" placeholder="Coupon code" [disabled]="!!appliedCoupon">
           <button class="btn btn-outline" (click)="applyCoupon()" [disabled]="!couponCode || applyingCoupon || !!appliedCoupon">
             Apply
           </button>
-          <button *ngIf="appliedCoupon" class="btn btn-outline remove-coupon" (click)="removeCoupon()">
+          <button *ngIf="appliedCoupon" class="btn btn-outline" (click)="removeCoupon()">
             Remove
           </button>
         </div>

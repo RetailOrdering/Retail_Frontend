@@ -4,6 +4,7 @@ import { CartService } from '../../../core/services/cart.service';
 import { LoyaltyService } from '../../../core/services/loyalty.service';
 import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-navbar',
@@ -18,6 +19,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   loyaltyPoints = 0;
   mobileMenuOpen = false;
   userMenuOpen = false;
+  isScrolled = false;
 
   private userSub?: Subscription;
   private cartSub?: Subscription;
@@ -43,13 +45,17 @@ export class NavbarComponent implements OnInit, OnDestroy {
             this.loadCart();
           }
         } else {
-          // reset on logout
           this.cartItemCount = 0;
           this.loyaltyPoints = 0;
         }
       },
       error: (err) => console.error('Auth error', err)
     });
+  }
+
+  @HostListener('window:scroll')
+  onScroll(): void {
+    this.isScrolled = window.scrollY > 10;
   }
 
   loadLoyaltyPoints(): void {
@@ -69,11 +75,16 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   get userNameInitial(): string {
-    return this.userName ? this.userName.charAt(0).toUpperCase() : '👤';
+    return this.userName ? this.userName.charAt(0).toUpperCase() : 'U';
   }
 
   toggleMobileMenu(): void {
     this.mobileMenuOpen = !this.mobileMenuOpen;
+    this.userMenuOpen = false;
+  }
+
+  closeMobileMenu(): void {
+    this.mobileMenuOpen = false;
   }
 
   toggleUserMenu(): void {
@@ -91,9 +102,35 @@ export class NavbarComponent implements OnInit, OnDestroy {
     }
   }
 
-  logout(): void {
-    this.authService.logout();
-    this.router.navigate(['/login']);
+  async logout(): Promise<void> {
+    const result = await Swal.fire({
+      title: 'Leaving so soon?',
+      text: 'Are you sure you want to logout?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#C84B31',
+      cancelButtonColor: '#9A9AAE',
+      confirmButtonText: 'Yes, logout',
+      cancelButtonText: 'Stay',
+      // borderRadius: '12px',
+      customClass: {
+        popup: 'swal-popup',
+        confirmButton: 'swal-confirm',
+      }
+    });
+
+    if (result.isConfirmed) {
+      this.authService.logout();
+      this.router.navigate(['/login']);
+      Swal.fire({
+        title: 'See you soon!',
+        icon: 'success',
+        timer: 1500,
+        showConfirmButton: false,
+        toast: true,
+        position: 'top-end'
+      });
+    }
   }
 
   ngOnDestroy(): void {

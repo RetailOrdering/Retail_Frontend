@@ -1,21 +1,38 @@
 <div class="product-card" (click)="navigateToDetail()">
-  <div class="image-wrapper">
+  <!-- Image Area -->
+  <div class="card-image">
     <div class="image-placeholder">
-      <span>{{ product.name.charAt(0) }}</span>
+      <span class="category-emoji">{{ getCategoryIcon() }}</span>
     </div>
+    <!-- Stock Badge -->
     <span *ngIf="product.stock === 0" class="stock-badge out-of-stock">Out of Stock</span>
-    <span *ngIf="product.stock > 0 && product.stock <= 5" class="stock-badge low-stock">⚠️ Only {{ product.stock }} left</span>
-    <span *ngIf="!product.isAvailable" class="stock-badge unavailable">Unavailable</span>
+    <span *ngIf="product.stock > 0 && product.stock <= 5" class="stock-badge low-stock">
+      Only {{ product.stock }} left
+    </span>
+    <span *ngIf="!product.isAvailable && product.stock > 0" class="stock-badge unavailable">
+      Unavailable
+    </span>
   </div>
-  <div class="card-body">
-    <h3 class="product-title">{{ product.name }}</h3>
-    <p class="product-brand" *ngIf="product.brand">{{ product.brand }}</p>
-    <p class="product-price">₹{{ product.price | number:'1.2-2' }}</p>
-    <button 
-      class="btn btn-primary add-to-cart" 
-      (click)="addToCart($event)"
-      [disabled]="product.stock === 0 || !product.isAvailable">
-      🛒 Add to Cart
-    </button>
+
+  <!-- Card Content -->
+  <div class="card-content">
+    <div class="card-header">
+      <h3 class="product-title">{{ product.name }}</h3>
+      <p class="product-brand" *ngIf="product.brand">{{ product.brand }}</p>
+    </div>
+    <div class="card-footer">
+      <div class="price-wrapper">
+        <span class="currency">₹</span>
+        <span class="price-value">{{ product.price | number:'1.0-0' }}</span>
+      </div>
+      <button 
+        class="add-to-cart-btn"
+        [class.loading]="isAddingToCart"
+        (click)="addToCart($event)"
+        [disabled]="product.stock === 0 || !product.isAvailable">
+        <span *ngIf="!isAddingToCart">🛒 Add</span>
+        <span *ngIf="isAddingToCart">⏳</span>
+      </button>
+    </div>
   </div>
 </div>

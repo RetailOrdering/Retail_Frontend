@@ -1,0 +1,182 @@
+<div class="homepage">
+
+  <!-- ===== HERO ===== -->
+  <section class="hero">
+    <div class="hero-bg-pattern"></div>
+    <div class="hero-bg-dots"></div>
+
+    <div class="hero-container">
+      <div class="hero-content">
+        <span class="hero-label">🔥 Fresh & Hot Every Day</span>
+
+        <h1 class="hero-title">
+          Order Your <span class="accent">Favourites</span><br>
+          In Minutes
+        </h1>
+
+        <p class="hero-desc">
+          Browse our handpicked selection of pizzas, cold drinks, and artisan breads.
+          Earn loyalty points on every order and enjoy exclusive deals.
+        </p>
+
+        <div class="hero-cta">
+          <button class="btn btn-primary" routerLink="/products">
+            🛍️ Browse Menu
+          </button>
+          <button class="btn btn-outline" style="color:rgba(255,255,255,0.7); border-color:rgba(255,255,255,0.2);"
+                  routerLink="/register">
+            Create Account
+          </button>
+        </div>
+
+        <div class="hero-stats">
+          <div class="stat-item">
+            <div class="stat-value">50+</div>
+            <div class="stat-label">Menu Items</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">30min</div>
+            <div class="stat-label">Avg Delivery</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">4.9★</div>
+            <div class="stat-label">Rating</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hero Visual -->
+      <div class="hero-visual">
+        <div class="hero-food-grid">
+          <div class="food-card">
+            <span class="food-icon">🍕</span>
+            <p class="food-name">Pizza</p>
+            <p class="food-sub">12 varieties</p>
+          </div>
+          <div class="food-card">
+            <span class="food-icon">🥤</span>
+            <p class="food-name">Cold Drinks</p>
+            <p class="food-sub">18 options</p>
+          </div>
+          <div class="food-card">
+            <span class="food-icon">🍞</span>
+            <p class="food-name">Breads</p>
+            <p class="food-sub">8 types</p>
+          </div>
+          <div class="food-card">
+            <span class="food-icon">🎁</span>
+            <p class="food-name">Combos</p>
+            <p class="food-sub">Best value</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CATEGORY STRIP ===== -->
+  <section class="category-strip">
+    <div class="container">
+      <div class="category-list">
+        <a class="category-chip active" routerLink="/products">
+          <span class="chip-icon">✨</span> All Items
+        </a>
+        <a class="category-chip" routerLink="/products">
+          <span class="chip-icon">🍕</span> Pizzas
+        </a>
+        <a class="category-chip" routerLink="/products">
+          <span class="chip-icon">🥤</span> Cold Drinks
+        </a>
+        <a class="category-chip" routerLink="/products">
+          <span class="chip-icon">🍞</span> Breads
+        </a>
+        <a class="category-chip" routerLink="/products">
+          <span class="chip-icon">🔥</span> Best Sellers
+        </a>
+        <a class="category-chip" routerLink="/products">
+          <span class="chip-icon">⭐</span> New Arrivals
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FEATURED PRODUCTS ===== -->
+  <section class="section" *ngIf="featuredProducts.length > 0">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-label">✨ Handpicked</span>
+        <h2 class="section-title">Today's Highlights</h2>
+        <p class="section-desc">Our most loved items, ready to be delivered to your door.</p>
+      </div>
+
+      <div class="products-grid">
+        <app-product-card
+          *ngFor="let product of featuredProducts"
+          [product]="product">
+        </app-product-card>
+      </div>
+
+      <div style="text-align:center; margin-top: 40px;">
+        <button class="btn btn-outline" routerLink="/products">
+          View Full Menu →
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FEATURES ===== -->
+  <section class="features-section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-label">Why RetailHub</span>
+        <h2 class="section-title">Built for You</h2>
+        <p class="section-desc">A seamless experience from browsing to your doorstep.</p>
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon-wrap">⚡</div>
+          <h3 class="feature-title">Lightning Fast Orders</h3>
+          <p class="feature-desc">From browse to checkout in under 60 seconds. Instant confirmation on every order.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon-wrap">⭐</div>
+          <h3 class="feature-title">Loyalty Rewards</h3>
+          <p class="feature-desc">Earn points on every purchase. Redeem them for discounts on future orders.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon-wrap">🏷️</div>
+          <h3 class="feature-title">Exclusive Coupons</h3>
+          <p class="feature-desc">Seasonal promotions and coupon codes for extra savings, every week.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon-wrap">📦</div>
+          <h3 class="feature-title">Order Tracking</h3>
+          <p class="feature-desc">Full order history with real-time status updates and quick reorder functionality.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon-wrap">🔒</div>
+          <h3 class="feature-title">Secure Payments</h3>
+          <p class="feature-desc">Enterprise-grade security with JWT authentication and rate-limited APIs.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon-wrap">📧</div>
+          <h3 class="feature-title">Email Confirmations</h3>
+          <p class="feature-desc">Instant email receipts with order details every time you place an order.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CTA ===== -->
+  <section class="cta-section">
+    <div class="container">
+      <span class="section-label" style="color:rgba(255,255,255,0.7)">Ready to order?</span>
+      <h2 class="section-title">Hungry? Let's Fix That.</h2>
+      <p class="section-desc">
+        Join thousands of happy customers. Sign up free and get your first order placed in minutes.
+      </p>
+      <button class="btn btn-primary" routerLink="/products">Order Now 🛍️</button>
+    </div>
+  </section>
+
+</div>

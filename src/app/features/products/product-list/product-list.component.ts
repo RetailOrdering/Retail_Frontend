@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { ProductService } from '../../../core/services/product.service';
 import { Product } from '../../../models/product';
-import { Category } from '../../../models/category';   // ✅ fixed import
+import { Category } from '../../../models/category';
 import { CategoryService } from 'src/app/core/services/category.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-product-list',
@@ -20,7 +21,7 @@ export class ProductListComponent implements OnInit {
 
   constructor(
     private productService: ProductService,
-    private categoryService: CategoryService   // ✅ now injectable
+    private categoryService: CategoryService
   ) {}
 
   ngOnInit(): void {
@@ -39,8 +40,13 @@ export class ProductListComponent implements OnInit {
       },
       error: (err) => {
         console.error(err);
-        this.error = 'Failed to load products. Please try again.';
         this.loading = false;
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Failed to load products. Please try again.',
+          confirmButtonColor: '#4F46E5'
+        });
       }
     });
   }
@@ -52,6 +58,16 @@ export class ProductListComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error loading categories', err);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Could not load categories.',
+          confirmButtonColor: '#4F46E5',
+          timer: 2000,
+          showConfirmButton: false,
+          toast: true,
+          position: 'top-end'
+        });
       }
     });
   }

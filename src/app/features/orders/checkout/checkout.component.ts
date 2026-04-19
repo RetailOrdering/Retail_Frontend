@@ -5,6 +5,7 @@ import { OrderService } from '../../../core/services/order.service';
 import { LoyaltyService } from '../../../core/services/loyalty.service';
 import { CartItem } from '../../../models/cart-item';
 import { CreateOrderDto } from '../../../models/dto-models';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-checkout',
@@ -36,7 +37,6 @@ export class CheckoutComponent implements OnInit {
     private loyaltyService: LoyaltyService,
     private router: Router
   ) {
-    // Get coupon code from navigation state (passed from cart)
     const navigation = this.router.getCurrentNavigation();
     if (navigation?.extras.state) {
       const code = navigation.extras.state['couponCode'] || '';
@@ -61,6 +61,12 @@ export class CheckoutComponent implements OnInit {
       error: (err) => {
         console.error(err);
         this.loading = false;
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Could not load cart.',
+          confirmButtonColor: '#4F46E5'
+        });
       }
     });
   }
@@ -74,7 +80,7 @@ export class CheckoutComponent implements OnInit {
 
   calculateTotals(): void {
     this.subtotal = this.cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    this.discount = 0; // Coupon discount will be applied by backend; we can re‑validate if needed
+    this.discount = 0;
     this.total = this.subtotal - this.discount - this.pointsDiscount;
   }
 
@@ -84,11 +90,18 @@ export class CheckoutComponent implements OnInit {
 
     this.loyaltyService.redeemPoints({ points }).subscribe({
       next: (response: any) => {
-        // Adjust discount based on your backend response
         this.pointsDiscount = response.discountAmount || (points / 100) * this.total;
         this.total = this.subtotal - this.discount - this.pointsDiscount;
         this.loyaltyPoints -= points;
-        alert(`Redeemed ${points} points!`);
+        Swal.fire({
+          icon: 'success',
+          title: 'Points Redeemed',
+          html: `${points} points redeemed!`,
+          timer: 2000,
+          showConfirmButton: false,
+          toast: true,
+          position: 'top-end'
+        });
       },
       error: (err) => console.error(err)
     });
@@ -96,18 +109,39 @@ export class CheckoutComponent implements OnInit {
 
   placeOrder(): void {
     if (!this.orderData.address || !this.orderData.paymentMethod) {
-      alert('Please fill all required fields');
+      Swal.fire({
+        icon: 'warning',
+        title: 'Missing Information',
+        text: 'Please fill in address and payment method.',
+        confirmButtonColor: '#4F46E5'
+      });
       return;
     }
     this.placingOrder = true;
     this.orderService.placeOrder(this.orderData).subscribe({
       next: (order) => {
-        alert('Order placed successfully!');
-        this.router.navigate(['/orders', order.id]);
+        Swal.fire({
+          icon: 'success',
+          title: 'Order Placed!',
+          html: `Your order #${order.id} has been placed successfully.`,
+          confirmButtonColor: '#4F46E5',
+          confirmButtonText: 'View Order'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            this.router.navigate(['/orders', order.id]);
+          } else {
+            this.router.navigate(['/orders']);
+          }
+        });
       },
       error: (err) => {
         console.error(err);
-        alert('Failed to place order. Please try again.');
+        Swal.fire({
+          icon: 'error',
+          title: 'Order Failed',
+          text: 'Could not place order. Please try again.',
+          confirmButtonColor: '#4F46E5'
+        });
         this.placingOrder = false;
       }
     });

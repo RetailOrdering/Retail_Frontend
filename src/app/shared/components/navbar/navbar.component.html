@@ -1,49 +1,67 @@
-<nav class="navbar">
+<nav class="navbar" [class.scrolled]="isScrolled">
   <div class="container nav-container">
+
     <!-- Logo -->
     <a routerLink="/" class="logo">
-      🛍️ <span>RetailHub</span>
+      <div class="logo-icon">🛍️</div>
+      <span class="logo-text">Retail<span>Hub</span></span>
     </a>
 
-    <!-- Navigation Links (Dynamic) -->
+    <!-- Navigation Links -->
     <div class="nav-links" [class.open]="mobileMenuOpen">
-      <a routerLink="/products" routerLinkActive="active">Products</a>
 
-      <!-- Customer only links -->
-      <a *ngIf="isLoggedIn && userRole !== 'Admin'" routerLink="/orders" routerLinkActive="active">My Orders</a>
+      <a routerLink="/products" routerLinkActive="active" (click)="closeMobileMenu()">Products</a>
 
-      <!-- Admin only links -->
+      <!-- Customer only -->
+      <a *ngIf="isLoggedIn && userRole !== 'Admin'"
+         routerLink="/orders" routerLinkActive="active"
+         (click)="closeMobileMenu()">My Orders</a>
+
+      <!-- Admin only -->
       <ng-container *ngIf="isLoggedIn && userRole === 'Admin'">
-        <a routerLink="/admin/dashboard" routerLinkActive="active">Dashboard</a>
-        <a routerLink="/admin/orders" routerLinkActive="active">Manage Orders</a>
-        <a routerLink="/admin/products" routerLinkActive="active">Manage Products</a>
+        <a routerLink="/admin/dashboard" routerLinkActive="active" (click)="closeMobileMenu()">Dashboard</a>
+        <a routerLink="/admin/orders"    routerLinkActive="active" (click)="closeMobileMenu()">Manage Orders</a>
+        <a routerLink="/admin/products"  routerLinkActive="active" (click)="closeMobileMenu()">Manage Products</a>
       </ng-container>
     </div>
 
-    <!-- Right side actions -->
+    <!-- Right Actions -->
     <div class="nav-actions">
-      <!-- Cart – visible only for customers (not admin) -->
-      <button *ngIf="isLoggedIn && userRole !== 'Admin'" class="cart-btn" routerLink="/cart">
-        🛒 <span class="cart-count" *ngIf="cartItemCount > 0">{{ cartItemCount }}</span>
+
+      <!-- Cart (customers only) -->
+      <button *ngIf="isLoggedIn && userRole !== 'Admin'"
+              class="cart-btn"
+              routerLink="/cart"
+              title="View Cart">
+        🛒
+        <span class="cart-count" *ngIf="cartItemCount > 0">{{ cartItemCount }}</span>
       </button>
 
-      <!-- User Menu (logged in) -->
+      <!-- Logged in: User menu -->
       <div class="user-menu" *ngIf="isLoggedIn; else loginRegister">
-        <button class="user-avatar" (click)="toggleUserMenu()">
+        <button class="user-avatar" (click)="toggleUserMenu()" [title]="userName">
           {{ userNameInitial }}
         </button>
+
         <div class="dropdown" *ngIf="userMenuOpen">
-          <p class="user-name">{{ userName }}</p>
-          <p class="user-role">{{ userRole === 'Admin' ? 'Administrator' : 'Customer' }}</p>
-          <!-- Loyalty Points (only for customers) -->
-          <div class="loyalty-points" *ngIf="userRole !== 'Admin'">
-            ⭐ <span>{{ loyaltyPoints }}</span> points
+          <div class="dropdown-header">
+            <p class="user-name">{{ userName }}</p>
+            <p class="user-role">{{ userRole === 'Admin' ? 'Administrator' : 'Customer' }}</p>
           </div>
-          <button class="dropdown-item" (click)="logout()">Logout</button>
+
+          <!-- Loyalty Points -->
+          <div class="loyalty-points" *ngIf="userRole !== 'Admin'">
+            ⭐ Loyalty Points
+            <span class="loyalty-badge">{{ loyaltyPoints }}</span>
+          </div>
+
+          <button class="dropdown-item danger" (click)="logout()">
+            🚪 Logout
+          </button>
         </div>
       </div>
 
-      <!-- Login/Register (not logged in) -->
+      <!-- Not logged in -->
       <ng-template #loginRegister>
         <div class="auth-buttons">
           <button class="btn btn-outline" routerLink="/login">Login</button>
@@ -51,8 +69,13 @@
         </div>
       </ng-template>
 
-      <!-- Mobile menu toggle -->
-      <button class="mobile-toggle" (click)="toggleMobileMenu()">☰</button>
+      <!-- Mobile toggle -->
+      <button class="mobile-toggle" [class.open]="mobileMenuOpen" (click)="toggleMobileMenu()">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
     </div>
+
   </div>
 </nav>

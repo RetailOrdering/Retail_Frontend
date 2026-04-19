@@ -1,103 +1,161 @@
+/* ===== PRODUCT CARD – REDESIGNED ===== */
 .product-card {
   background: white;
-  border-radius: var(--radius);
+  border-radius: var(--radius-lg);
   overflow: hidden;
-  transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
-  box-shadow: var(--shadow);
   cursor: pointer;
-  height: 100%;
+  transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--gray-200);
   display: flex;
   flex-direction: column;
 }
 
 .product-card:hover {
-  transform: translateY(-8px);
-  box-shadow: var(--shadow-xl);
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--primary-light);
 }
 
-.image-wrapper {
+/* Image Area */
+.card-image {
   position: relative;
   aspect-ratio: 1 / 1;
-  background: linear-gradient(135deg, var(--gray-100), var(--gray-200));
+  background: linear-gradient(135deg, var(--gray-100), var(--gray-50));
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
 }
 
 .image-placeholder {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  text-align: center;
+  transition: transform 0.4s ease;
+}
+.product-card:hover .image-placeholder {
+  transform: scale(1.05);
+}
+.category-emoji {
   font-size: 4rem;
-  font-weight: bold;
-  color: var(--primary);
-  text-transform: uppercase;
+  display: block;
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
 }
 
+/* Stock Badges */
 .stock-badge {
   position: absolute;
   top: 12px;
-  right: 12px;
-  padding: 0.25rem 0.6rem;
-  border-radius: 20px;
+  left: 12px;
   font-size: 0.7rem;
-  font-weight: bold;
-  color: white;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
   backdrop-filter: blur(4px);
+  z-index: 2;
 }
-
+.stock-badge.out-of-stock {
+  background: rgba(239, 68, 68, 0.9);
+  color: white;
+}
 .stock-badge.low-stock {
-  background: var(--warning);
+  background: rgba(245, 158, 11, 0.9);
   color: var(--gray-900);
 }
-
-.stock-badge.out-of-stock {
-  background: var(--danger);
-}
-
 .stock-badge.unavailable {
-  background: var(--gray-500);
+  background: rgba(107, 114, 128, 0.9);
+  color: white;
 }
 
-.card-body {
+/* Card Content */
+.card-content {
   padding: 1rem;
-  flex: 1;
   display: flex;
   flex-direction: column;
+  gap: 0.75rem;
 }
 
+.card-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
 .product-title {
   font-size: 1rem;
   font-weight: 700;
-  margin-bottom: 0.25rem;
-  white-space: nowrap;
+  color: var(--gray-800);
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
 }
-
 .product-brand {
   font-size: 0.75rem;
   color: var(--gray-500);
-  margin-bottom: 0.5rem;
 }
 
-.product-price {
-  font-size: 1.25rem;
-  font-weight: 800;
+.card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 0.25rem;
+}
+.price-wrapper {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+}
+.currency {
+  font-size: 0.85rem;
+  font-weight: 500;
   color: var(--primary);
-  margin-bottom: 1rem;
+}
+.price-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--primary);
 }
 
-.add-to-cart {
-  width: 100%;
-  justify-content: center;
-  margin-top: auto;
+.add-to-cart-btn {
+  background: var(--primary);
+  border: none;
+  border-radius: 2rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: var(--shadow-xs);
 }
-
-.add-to-cart:disabled {
-  opacity: 0.5;
+.add-to-cart-btn:hover:not(:disabled) {
+  background: var(--primary-dark);
+  transform: scale(1.02);
+  box-shadow: var(--shadow-sm);
+}
+.add-to-cart-btn:disabled {
+  background: var(--gray-300);
   cursor: not-allowed;
-  transform: none;
+  opacity: 0.6;
+}
+.add-to-cart-btn.loading {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+/* Responsive: adjust for very small screens */
+@media (max-width: 480px) {
+  .add-to-cart-btn {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.75rem;
+  }
+  .price-value {
+    font-size: 1rem;
+  }
+  .category-emoji {
+    font-size: 2.8rem;
+  }
 }

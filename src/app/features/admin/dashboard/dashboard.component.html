@@ -2,46 +2,94 @@
   <div class="container">
     <h1>Admin Dashboard</h1>
 
-    <div *ngIf="loading" class="loader-wrapper"><div class="loader"></div><p>Loading...</p></div>
-    <div *ngIf="error" class="error-message">{{ error }} <button class="btn btn-outline" (click)="loadDashboard()">Retry</button></div>
+    <div *ngIf="loading" class="loader-wrapper">
+      <div class="loader"></div>
+      <p>Loading dashboard...</p>
+    </div>
 
-    <div *ngIf="!loading && !error && dashboardData">
+    <div *ngIf="error" class="error-message">
+      {{ error }}
+      <button class="btn btn-outline" (click)="loadData()">Retry</button>
+    </div>
+
+    <div *ngIf="!loading && !error">
+      <!-- Stats Cards -->
       <div class="stats-grid">
-        <div class="stat-card"><div class="stat-icon">📦</div><div><h3>Total Orders</h3><p>{{ dashboardData.totalOrders || 0 }}</p></div></div>
-        <div class="stat-card"><div class="stat-icon">💰</div><div><h3>Revenue</h3><p>₹{{ (dashboardData.totalRevenue || 0) | number:'1.2-2' }}</p></div></div>
-        <div class="stat-card"><div class="stat-icon">👥</div><div><h3>Users</h3><p>{{ dashboardData.totalUsers || 0 }}</p></div></div>
-        <div class="stat-card"><div class="stat-icon">⚠️</div><div><h3>Low Stock</h3><p>{{ dashboardData.lowStockCount || 0 }}</p></div></div>
-      </div>
-
-      <div class="action-buttons">
-        <button class="btn btn-outline" (click)="loadUsers()">📋 Manage Users</button>
-        <button class="btn btn-outline" (click)="loadLowStock()">📦 Low Stock Products</button>
-      </div>
-
-      <!-- Users List -->
-      <div *ngIf="showUsers" class="users-section">
-        <h2>Users</h2>
-        <table class="data-table">
-          <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Role</th><th>Action</th></tr></thead>
-          <tbody>
-            <tr *ngFor="let user of users">
-              <td>{{ user.id }}</td><td>{{ user.name }}</td><td>{{ user.email }}</td>
-              <td><select [(ngModel)]="user.role" (change)="updateUserRole(user.id, user.role)"><option value="Customer">Customer</option><option value="Admin">Admin</option></select></td>
-              <td><button class="btn-sm btn-primary" (click)="updateUserRole(user.id, user.role)">Update</button></td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="stat-card">
+          <div class="stat-icon">📦</div>
+          <div class="stat-info">
+            <h3>Total Orders</h3>
+            <p>{{ dashboardData.totalOrders || 0 }}</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">💰</div>
+          <div class="stat-info">
+            <h3>Revenue</h3>
+            <p>₹{{ (dashboardData.totalRevenue || 0) | number:'1.2-2' }}</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">👥</div>
+          <div class="stat-info">
+            <h3>Total Users</h3>
+            <p>{{ dashboardData.totalUsers || 0 }}</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">⭐</div>
+          <div class="stat-info">
+            <h3>Avg Rating</h3>
+            <p>{{ dashboardData.avgRating || 4.8 }}</p>
+          </div>
+        </div>
       </div>
 
       <!-- Low Stock Products -->
-      <div *ngIf="showLowStock" class="lowstock-section">
-        <h2>Low Stock Products (≤5)</h2>
-        <table class="data-table">
-          <thead><tr><th>ID</th><th>Name</th><th>Stock</th><th>Brand</th></tr></thead>
-          <tbody>
-            <tr *ngFor="let p of lowStockProducts"><td>{{ p.id }}</td><td>{{ p.name }}</td><td class="warning">{{ p.stock }}</td><td>{{ p.brand }}</td></tr>
-          </tbody>
-        </table>
+      <div class="section">
+        <h2>Low Stock Products</h2>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr><th>Product</th><th>Stock</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let product of lowStockProducts">
+                <td>{{ product.name }}</td>
+                <td class="text-danger">{{ product.stock }}</td>
+                <td><span class="badge warning">Low Stock</span></td>
+              </tr>
+              <tr *ngIf="lowStockProducts.length === 0">
+                <td colspan="3" class="text-center">No low stock products</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Users List -->
+      <div class="section">
+        <h2>Users</h2>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr><th>Name</th><th>Email</th><th>Role</th><th>Action</th></tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let user of users">
+                <td>{{ user.name }}</td>
+                <td>{{ user.email }}</td>
+                <td>
+                  <select [(ngModel)]="user.role" (change)="updateRole(user.id, user.role)" class="role-select">
+                    <option value="Customer">Customer</option>
+                    <option value="Admin">Admin</option>
+                  </select>
+                </td>
+                <td><button class="btn btn-sm btn-primary" (click)="updateRole(user.id, user.role)">Save</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
