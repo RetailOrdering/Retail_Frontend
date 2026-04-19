@@ -1,23 +1,37 @@
-<div class="container d-flex align-items-center justify-content-center" style="min-height: 70vh;">
-  <div class="card shadow-sm border-0" style="max-width: 420px; width: 100%;">
-    <div class="card-body p-4">
-      <h3 class="text-center fw-bold mb-1">Welcome back</h3>
-      <p class="text-center text-muted small mb-4">Sign in to your account</p>
-      <form #loginForm="ngForm" (ngSubmit)="onSubmit()">
-        <div class="mb-3">
-          <label class="form-label">Email</label>
-          <input type="email" class="form-control" [(ngModel)]="email" name="email" required autofocus>
+<div class="auth-page">
+  <div class="auth-container">
+    <div class="auth-card">
+      <div class="auth-header">
+        <h1>Welcome Back</h1>
+        <p>Sign in to continue shopping</p>
+      </div>
+
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" formControlName="email" placeholder="you@example.com">
+          <span class="error" *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
+            Valid email is required
+          </span>
         </div>
-        <div class="mb-4">
-          <label class="form-label">Password</label>
-          <input type="password" class="form-control" [(ngModel)]="password" name="password" required>
+
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" formControlName="password" placeholder="••••••">
+          <span class="error" *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+            Password must be at least 6 characters
+          </span>
         </div>
-        <button type="submit" class="btn btn-primary w-100 py-2" [disabled]="loading">
-          {{ loading ? 'Logging in...' : 'Login' }}
+
+        <div class="error-message" *ngIf="error">{{ error }}</div>
+
+        <button type="submit" class="btn btn-primary" [disabled]="loading">
+          {{ loading ? 'Signing in...' : 'Sign In' }}
         </button>
       </form>
-      <div class="text-center mt-4">
-        <small class="text-muted">Don't have an account? <a routerLink="/register" class="text-decoration-none fw-medium">Register</a></small>
+
+      <div class="auth-footer">
+        Don't have an account? <a routerLink="/register">Sign up</a>
       </div>
     </div>
   </div>

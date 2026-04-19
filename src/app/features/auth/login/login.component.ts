@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 
@@ -8,28 +9,33 @@ import { AuthService } from '../../../core/services/auth.service';
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
-  email = '';
-  password = '';
+  loginForm: FormGroup;
   loading = false;
-  errorMessage = '';
+  error = '';
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private fb: FormBuilder,
+    private authService: AuthService,
+    private router: Router
+  ) {
+    this.loginForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(6)]]
+    });
+  }
 
   onSubmit(): void {
+    if (this.loginForm.invalid) return;
     this.loading = true;
-    this.errorMessage = '';
-    this.authService.login(this.email, this.password).subscribe({
-      next: (res) => {
-        // After successful login, get the current user from AuthService
-        const user = this.authService.getCurrentUser();
-        if (user?.role === 'Admin') {
-          this.router.navigate(['/admin/dashboard']);
-        } else {
-          this.router.navigate(['/products']);
-        }
+    this.error = '';
+
+    const { email, password } = this.loginForm.value;
+    this.authService.login(email, password).subscribe({
+      next: () => {
+        this.router.navigate(['/products']);
       },
       error: (err) => {
-        this.errorMessage = 'Invalid email or password';
+        this.error = err.error?.message || 'Login failed. Please check your credentials.';
         this.loading = false;
       }
     });

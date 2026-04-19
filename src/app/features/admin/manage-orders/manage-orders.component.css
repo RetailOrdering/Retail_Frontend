@@ -1,0 +1,11 @@
+.manage-orders { padding: 2rem 0 4rem; background: var(--gray-50); }
+.container { max-width: 1280px; margin: 0 auto; padding: 0 1.5rem; }
+h1 { margin-bottom: 2rem; }
+.data-table { width: 100%; background: white; border-radius: var(--radius); border-collapse: collapse; overflow-x: auto; display: block; }
+.data-table th, .data-table td { padding: 0.75rem; text-align: left; border-bottom: 1px solid var(--gray-200); }
+.badge { padding: 0.25rem 0.75rem; border-radius: 2rem; font-size: 0.8rem; font-weight: 600; }
+.badge-pending { background: #fef3c7; color: #d97706; }
+.badge-confirmed { background: #dbeafe; color: #2563eb; }
+.badge-delivered { background: #d1fae5; color: #059669; }
+.badge-cancelled { background: #fee2e2; color: #dc2626; }
+select { padding: 0.25rem; border-radius: var(--radius-sm); border: 1px solid var(--gray-300); }

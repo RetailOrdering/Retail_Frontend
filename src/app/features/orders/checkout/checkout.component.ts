@@ -2,7 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CartService } from '../../../core/services/cart.service';
 import { OrderService } from '../../../core/services/order.service';
-import { CouponService } from '../../../core/services/coupon.service';
+import { LoyaltyService } from '../../../core/services/loyalty.service';
+import { CartItem } from '../../../models/cart-item';
+import { CreateOrderDto } from '../../../models/dto-models';
 
 @Component({
   selector: 'app-checkout',
@@ -10,66 +12,102 @@ import { CouponService } from '../../../core/services/coupon.service';
   styleUrls: ['./checkout.component.css']
 })
 export class CheckoutComponent implements OnInit {
-  cartItems: any[] = [];
+  cartItems: CartItem[] = [];
   subtotal = 0;
-  address = { name: '', line: '' };
-  paymentMethod = 'Cash on Delivery';
-  couponCode = '';
-  discountPercent = 0;
-  discountAmount = 0;
+  discount = 0;
   total = 0;
+  loading = true;
   placingOrder = false;
-couponValid: any;
+
+  couponCode = '';
+  loyaltyPoints = 0;
+  pointsToRedeem = 0;
+  pointsDiscount = 0;
+
+  orderData: CreateOrderDto = {
+    address: '',
+    paymentMethod: '',
+    couponCode: ''
+  };
 
   constructor(
     private cartService: CartService,
     private orderService: OrderService,
-    private couponService: CouponService,
+    private loyaltyService: LoyaltyService,
     private router: Router
-  ) {}
-
-  ngOnInit(): void {
-    this.cartService.cartItems$.subscribe(items => {
-      this.cartItems = items;
-      this.subtotal = items.reduce((sum, i) => sum + (i.price * i.quantity), 0);
-      this.recalculateTotal();
-    });
+  ) {
+    // Get coupon code from navigation state (passed from cart)
+    const navigation = this.router.getCurrentNavigation();
+    if (navigation?.extras.state) {
+      const code = navigation.extras.state['couponCode'] || '';
+      this.orderData.couponCode = code;
+      this.couponCode = code;
+    }
   }
 
-  applyCoupon(): void {
-    if (!this.couponCode) return;
-    this.couponService.validateCoupon(this.couponCode, this.subtotal).subscribe(coupon => {
-      if (coupon) {
-        this.discountPercent = coupon.discountPercentage;
-        this.recalculateTotal();
-      } else {
-        alert('Invalid coupon');
-        this.discountPercent = 0;
-        this.recalculateTotal();
+  ngOnInit(): void {
+    this.loadCart();
+    this.loadLoyaltyPoints();
+  }
+
+  loadCart(): void {
+    this.loading = true;
+    this.cartService.getCart().subscribe({
+      next: (cart) => {
+        this.cartItems = cart.items || [];
+        this.calculateTotals();
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error(err);
+        this.loading = false;
       }
     });
   }
 
-  recalculateTotal(): void {
-    this.discountAmount = (this.subtotal * this.discountPercent) / 100;
-    this.total = this.subtotal - this.discountAmount;
+  loadLoyaltyPoints(): void {
+    this.loyaltyService.getPoints().subscribe({
+      next: (points) => this.loyaltyPoints = points,
+      error: (err) => console.error(err)
+    });
+  }
+
+  calculateTotals(): void {
+    this.subtotal = this.cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    this.discount = 0; // Coupon discount will be applied by backend; we can re‑validate if needed
+    this.total = this.subtotal - this.discount - this.pointsDiscount;
+  }
+
+  applyPoints(): void {
+    const points = Number(this.pointsToRedeem);
+    if (points > this.loyaltyPoints || points <= 0) return;
+
+    this.loyaltyService.redeemPoints({ points }).subscribe({
+      next: (response: any) => {
+        // Adjust discount based on your backend response
+        this.pointsDiscount = response.discountAmount || (points / 100) * this.total;
+        this.total = this.subtotal - this.discount - this.pointsDiscount;
+        this.loyaltyPoints -= points;
+        alert(`Redeemed ${points} points!`);
+      },
+      error: (err) => console.error(err)
+    });
   }
 
   placeOrder(): void {
+    if (!this.orderData.address || !this.orderData.paymentMethod) {
+      alert('Please fill all required fields');
+      return;
+    }
     this.placingOrder = true;
-    const orderData = {
-      address: `${this.address.line}, ${this.address.name}`,
-      paymentMethod: this.paymentMethod,
-      couponCode: this.couponCode || undefined
-    };
-    this.orderService.placeOrder(orderData).subscribe({
-      next: () => {
-        this.cartService.clearCart().subscribe();
-        this.router.navigate(['/orders']);
+    this.orderService.placeOrder(this.orderData).subscribe({
+      next: (order) => {
+        alert('Order placed successfully!');
+        this.router.navigate(['/orders', order.id]);
       },
       error: (err) => {
         console.error(err);
-        alert('Order failed');
+        alert('Failed to place order. Please try again.');
         this.placingOrder = false;
       }
     });

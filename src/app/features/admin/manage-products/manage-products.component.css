@@ -1,0 +1,12 @@
+.manage-products { padding: 2rem 0 4rem; background: var(--gray-50); }
+.container { max-width: 1280px; margin: 0 auto; padding: 0 1.5rem; }
+.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+h1 { margin: 0; }
+.data-table { width: 100%; background: white; border-radius: var(--radius); border-collapse: collapse; overflow-x: auto; display: block; }
+.data-table th, .data-table td { padding: 0.75rem; text-align: left; border-bottom: 1px solid var(--gray-200); }
+.low-stock { color: var(--warning); font-weight: bold; }
+.modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+.modal-content { background: white; padding: 2rem; border-radius: var(--radius); width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
+.modal-content input, .modal-content select, .modal-content textarea { width: 100%; margin-bottom: 1rem; }
+.form-buttons { display: flex; gap: 1rem; justify-content: flex-end; }
+.btn-sm { padding: 0.25rem 0.75rem; margin: 0 0.25rem; }

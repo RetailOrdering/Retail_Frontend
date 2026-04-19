@@ -1,1 +1,68 @@
-<p>product-detail works!</p>
+<div class="product-detail-page" *ngIf="!loading; else loader">
+  <div class="container" *ngIf="product">
+    <!-- Back button -->
+    <button class="back-btn" routerLink="/products">
+      ← Back to Products
+    </button>
+
+    <div class="product-detail-grid">
+      <!-- Product Image / Placeholder -->
+      <div class="product-image">
+        <div class="image-placeholder">
+          <span>{{ product.name.charAt(0) }}</span>
+        </div>
+        <span *ngIf="product.stock === 0" class="out-of-stock-badge">Out of Stock</span>
+        <span *ngIf="product.stock > 0 && product.stock <= 5" class="low-stock-badge">⚠️ Only {{ product.stock }} left</span>
+      </div>
+
+      <!-- Product Info -->
+      <div class="product-info">
+        <h1 class="product-title">{{ product.name }}</h1>
+        <div class="product-meta">
+          <span class="brand" *ngIf="product.brand">🏷️ {{ product.brand }}</span>
+          <span class="packaging" *ngIf="product.packaging">📦 {{ product.packaging }}</span>
+        </div>
+        <p class="product-category" *ngIf="categoryName">📁 {{ categoryName }}</p>
+        <div class="product-price">
+          <span class="current-price">₹{{ product.price | number:'1.2-2' }}</span>
+        </div>
+        <p class="product-description">{{ product.description }}</p>
+
+        <!-- Stock status -->
+        <div class="stock-status" [class.in-stock]="product.stock > 0" [class.out-stock]="product.stock === 0">
+          {{ product.stock > 0 ? '✅ In Stock' : '❌ Out of Stock' }}
+        </div>
+
+        <!-- Quantity selector & Add to Cart -->
+        <div class="cart-actions" *ngIf="product.stock > 0 && product.isAvailable">
+          <div class="quantity-selector">
+            <button (click)="decrementQuantity()" [disabled]="quantity <= 1">-</button>
+            <input type="number" [(ngModel)]="quantity" (change)="validateQuantity()" min="1" [max]="product.stock">
+            <button (click)="incrementQuantity()" [disabled]="quantity >= product.stock">+</button>
+          </div>
+          <button class="btn btn-primary add-to-cart-btn" (click)="addToCart()">
+            🛒 Add to Cart
+          </button>
+        </div>
+        <div *ngIf="!product.isAvailable" class="unavailable-message">
+          This product is currently unavailable.
+        </div>
+      </div>
+    </div>
+
+    <!-- Related Products -->
+    <div class="related-products" *ngIf="relatedProducts.length > 0">
+      <h2>You May Also Like</h2>
+      <div class="related-grid">
+        <app-product-card *ngFor="let p of relatedProducts" [product]="p"></app-product-card>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #loader>
+  <div class="loader-container">
+    <div class="loader"></div>
+    <p>Loading product details...</p>
+  </div>
+</ng-template>

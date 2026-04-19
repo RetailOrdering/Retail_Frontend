@@ -1,0 +1,77 @@
+<div class="order-detail-page" *ngIf="!loading; else loader">
+  <div class="container" *ngIf="order">
+    <!-- Back button -->
+    <button class="back-btn" (click)="goBack()">
+      ← Back to Orders
+    </button>
+
+    <div class="order-card">
+      <div class="order-header">
+        <h1>Order #{{ order.id }}</h1>
+        <div class="order-status" [class]="getStatusClass(order.status)">
+          {{ order.status }}
+        </div>
+      </div>
+
+      <div class="order-info-grid">
+        <div class="info-section">
+          <h3>Order Details</h3>
+          <p><strong>Placed on:</strong> {{ order.createdAt | date:'fullDate' }} at {{ order.createdAt | date:'shortTime' }}</p>
+          <p><strong>Last updated:</strong> {{ (order.updatedAt || order.createdAt) | date:'medium' }}</p>
+          <p><strong>Payment Method:</strong> {{ order.paymentMethod }}</p>
+          <p *ngIf="order.couponCode"><strong>Coupon:</strong> {{ order.couponCode }}</p>
+          <p><strong>Discount:</strong> ₹{{ order.discountAmount | number:'1.2-2' }}</p>
+        </div>
+
+        <div class="info-section">
+          <h3>Shipping Address</h3>
+          <p>{{ order.address }}</p>
+        </div>
+      </div>
+
+      <div class="items-section">
+        <h3>Items</h3>
+        <div class="items-table">
+          <div class="items-header">
+            <span>Product</span>
+            <span>Quantity</span>
+            <span>Price</span>
+            <span>Total</span>
+          </div>
+          <div class="item-row" *ngFor="let item of order.items">
+            <span>{{ item.productName || 'Product #' + item.productId }}</span>
+            <span>{{ item.quantity }}</span>
+            <span>₹{{ item.price | number:'1.2-2' }}</span>
+            <span>₹{{ (item.price * item.quantity) | number:'1.2-2' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="order-summary">
+        <div class="summary-row">
+          <span>Subtotal</span>
+          <span>₹{{ (order.totalAmount + order.discountAmount) | number:'1.2-2' }}</span>
+        </div>
+        <div class="summary-row" *ngIf="order.discountAmount > 0">
+          <span>Discount</span>
+          <span class="discount">- ₹{{ order.discountAmount | number:'1.2-2' }}</span>
+        </div>
+        <div class="summary-row total">
+          <span>Total Paid</span>
+          <span>₹{{ order.totalAmount | number:'1.2-2' }}</span>
+        </div>
+      </div>
+
+      <div class="order-actions" *ngIf="order.status === 'Pending'">
+        <button class="btn btn-danger" (click)="cancelOrder()">Cancel Order</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #loader>
+  <div class="loader-container">
+    <div class="loader"></div>
+    <p>Loading order details...</p>
+  </div>
+</ng-template>

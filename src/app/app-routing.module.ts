@@ -5,7 +5,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from './core/guards/auth.guard';
 import { AdminGuard } from './core/guards/admin.guard';
 
-// Components (your existing imports)
+// Components
 import { LoginComponent } from './features/auth/login/login.component';
 import { RegisterComponent } from './features/auth/register/register.component';
 import { ProductListComponent } from './features/products/product-list/product-list.component';
@@ -13,6 +13,7 @@ import { ProductDetailComponent } from './features/products/product-detail/produ
 import { CartPageComponent } from './features/cart/cart-page/cart-page.component';
 import { CheckoutComponent } from './features/orders/checkout/checkout.component';
 import { OrderHistoryComponent } from './features/orders/order-history/order-history.component';
+import { OrderDetailComponent } from './features/orders/order-detail/order-detail.component'; // ✅ Added
 import { DashboardComponent } from './features/admin/dashboard/dashboard.component';
 import { ManageProductsComponent } from './features/admin/manage-products/manage-products.component';
 import { ManageOrdersComponent } from './features/admin/manage-orders/manage-orders.component';
@@ -28,6 +29,7 @@ const routes: Routes = [
   { path: 'cart', component: CartPageComponent, canActivate: [AuthGuard] },
   { path: 'checkout', component: CheckoutComponent, canActivate: [AuthGuard] },
   { path: 'orders', component: OrderHistoryComponent, canActivate: [AuthGuard] },
+  { path: 'orders/:id', component: OrderDetailComponent, canActivate: [AuthGuard] }, // ✅ Added – note order matters: place after 'orders'
   
   // Admin routes (require admin role)
   { path: 'admin/dashboard', component: DashboardComponent, canActivate: [AdminGuard] },

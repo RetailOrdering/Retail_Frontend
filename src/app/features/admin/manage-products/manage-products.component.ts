@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { Product } from '../../../models/product';
 import { ProductService } from '../../../core/services/product.service';
-import { Modal } from 'bootstrap';
-import { CreateProductDto } from 'src/app/models/dto-models';
+import { CategoryService } from '../../../core/services/category.service';
+import { Product } from '../../../models/product';
+import { Category } from '../../../models/category';
+import { CreateProductDto, UpdateProductDto } from '../../../models/dto-models';
 
 @Component({
   selector: 'app-manage-products',
@@ -11,89 +12,80 @@ import { CreateProductDto } from 'src/app/models/dto-models';
 })
 export class ManageProductsComponent implements OnInit {
   products: Product[] = [];
-  loading = true;
-  isEditMode = false;
-  editId: number | null = null;
+  categories: Category[] = [];
+  loading = false;
+  error = '';
+  showForm = false;
+  editingProduct: Product | null = null;
+
   formData: CreateProductDto = {
     name: '',
     description: '',
     price: 0,
     packaging: '',
     brand: '',
-    categoryId: 1,
+    categoryId: 0,
     stock: 0,
-    isAvailable: undefined
+    isAvailable: true
   };
-  private modal: any;
 
-  constructor(private productService: ProductService) {}
+  constructor(private productService: ProductService, private categoryService: CategoryService) {}
 
   ngOnInit(): void {
     this.loadProducts();
+    this.loadCategories();
   }
 
   loadProducts(): void {
+    this.loading = true;
     this.productService.getProducts().subscribe({
-      next: (data) => {
-        this.products = data;
-        this.loading = false;
-      },
-      error: () => this.loading = false
+      next: (data) => { this.products = data; this.loading = false; },
+      error: (err) => { this.error = 'Failed to load products'; this.loading = false; }
     });
   }
 
-  openModal(): void {
-    this.isEditMode = false;
-    this.editId = null;
-    this.formData = {
-      name: '',
-      description: '',
-      price: 0,
-      packaging: '',
-      brand: '',
-      categoryId: 1,
-      stock: 0
-    };
-    const modalElem = document.getElementById('productModal');
-    this.modal = new Modal(modalElem!);
-    this.modal.show();
+  loadCategories(): void {
+    this.categoryService.getAllCategories().subscribe({
+      next: (data) => this.categories = data,
+      error: (err) => console.error(err)
+    });
+  }
+
+  openCreateForm(): void {
+    this.editingProduct = null;
+    this.formData = { name: '', description: '', price: 0, packaging: '', brand: '', categoryId: 0, stock: 0, isAvailable: true };
+    this.showForm = true;
   }
 
   editProduct(product: Product): void {
-    this.isEditMode = true;
-    this.editId = product.id;
-    this.formData = {
-      name: product.name,
-      description: product.description,
-      price: product.price,
-      packaging: product.packaging,
-      brand: product.brand,
-      categoryId: product.categoryId,
-      stock: product.stock,
-      isAvailable: product.isAvailable
-    };
-    const modalElem = document.getElementById('productModal');
-    this.modal = new Modal(modalElem!);
-    this.modal.show();
-  }
-
-  saveProduct(): void {
-    if (this.isEditMode && this.editId) {
-      this.productService.updateProduct(this.editId, this.formData).subscribe(() => {
-        this.modal.hide();
-        this.loadProducts();
-      });
-    } else {
-      this.productService.createProduct(this.formData).subscribe(() => {
-        this.modal.hide();
-        this.loadProducts();
-      });
-    }
+    this.editingProduct = product;
+    this.formData = { ...product };
+    this.showForm = true;
   }
 
   deleteProduct(id: number): void {
-    if (confirm('Delete this product permanently?')) {
-      this.productService.deleteProduct(id).subscribe(() => this.loadProducts());
+    if (confirm('Delete this product?')) {
+      this.productService.deleteProduct(id).subscribe({
+        next: () => this.loadProducts(),
+        error: (err) => alert('Delete failed')
+      });
     }
   }
+
+  submitForm(): void {
+    if (this.editingProduct) {
+      const updateDto: UpdateProductDto = this.formData;
+      this.productService.updateProduct(this.editingProduct.id, updateDto).subscribe({
+        next: () => { this.loadProducts(); this.showForm = false; },
+        error: (err) => alert('Update failed')
+      });
+    } else {
+      this.productService.createProduct(this.formData).subscribe({
+        next: () => { this.loadProducts(); this.showForm = false; },
+        error: (err) => alert('Create failed')
+      });
+    }
+  }
+
+  cancelForm(): void { this.showForm = false; }
 }

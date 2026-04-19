@@ -1,52 +1,56 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <div class="container-fluid">
-    <a class="navbar-brand" routerLink="/">🍕 RetailOrder</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ms-auto">
-        <!-- Products – visible to everyone -->
-        <li class="nav-item">
-          <a class="nav-link" routerLink="/products" routerLinkActive="active">Products</a>
-        </li>
+<nav class="navbar">
+  <div class="container nav-container">
+    <!-- Logo -->
+    <a routerLink="/" class="logo">
+      🛍️ <span>RetailHub</span>
+    </a>
 
-        <!-- Admin links (only when role is Admin) -->
-        <ng-container *ngIf="isLoggedIn && userRole === 'Admin'">
-          <li class="nav-item">
-            <a class="nav-link" routerLink="/admin/dashboard" routerLinkActive="active">Dashboard</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" routerLink="/admin/products" routerLinkActive="active">Manage Products</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" routerLink="/admin/orders" routerLinkActive="active">Manage Orders</a>
-          </li>
-        </ng-container>
+    <!-- Navigation Links (Dynamic) -->
+    <div class="nav-links" [class.open]="mobileMenuOpen">
+      <!-- Public links -->
+      <a routerLink="/products" routerLinkActive="active">Products</a>
 
-        <!-- Customer links (only when logged in as Customer) -->
-        <ng-container *ngIf="isLoggedIn && userRole === 'Customer'">
-          <li class="nav-item">
-            <a class="nav-link" routerLink="/orders" routerLinkActive="active">My Orders</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" routerLink="/cart" routerLinkActive="active">
-              Cart <span class="badge bg-primary">{{ cartItemCount }}</span>
-            </a>
-          </li>
-        </ng-container>
+      <!-- Customer only links -->
+      <a *ngIf="isLoggedIn && userRole !== 'Admin'" routerLink="/orders" routerLinkActive="active">My Orders</a>
 
-        <!-- Not logged in -->
-        <ng-container *ngIf="!isLoggedIn">
-          <li class="nav-item"><a class="nav-link" routerLink="/login">Login</a></li>
-          <li class="nav-item"><a class="nav-link" routerLink="/register">Register</a></li>
-        </ng-container>
+      <!-- Admin only links -->
+      <ng-container *ngIf="isLoggedIn && userRole === 'Admin'">
+        <a routerLink="/admin/dashboard" routerLinkActive="active">Dashboard</a>
+        <a routerLink="/admin/orders" routerLinkActive="active">Manage Orders</a>
+        <a routerLink="/admin/products" routerLinkActive="active">Manage Products</a>
+      </ng-container>
+    </div>
 
-        <!-- Logout button for both admin and customer -->
-        <li class="nav-item" *ngIf="isLoggedIn">
-          <button class="btn btn-outline-danger btn-sm" (click)="logout()">Logout</button>
-        </li>
-      </ul>
+    <!-- Right side actions -->
+    <div class="nav-actions">
+      <!-- Cart (visible only when logged in) -->
+      <button *ngIf="isLoggedIn" class="cart-btn" routerLink="/cart">
+        🛒 <span class="cart-count" *ngIf="cartItemCount > 0">{{ cartItemCount }}</span>
+      </button>
+
+      <!-- User Menu (logged in) -->
+      <div class="user-menu" *ngIf="isLoggedIn; else loginRegister">
+        <button class="user-avatar" (click)="toggleUserMenu()">
+          👤 {{ userNameInitial }}
+        </button>
+        <div class="dropdown" *ngIf="userMenuOpen">
+          <p class="user-name">{{ userName }}</p>
+          <p class="user-role">{{ userRole === 'Admin' ? 'Administrator' : 'Customer' }}</p>
+          <button class="dropdown-item" routerLink="/profile">Profile</button>
+          <button class="dropdown-item" (click)="logout()">Logout</button>
+        </div>
+      </div>
+
+      <!-- Login/Register (not logged in) -->
+      <ng-template #loginRegister>
+        <div class="auth-buttons">
+          <button class="btn btn-outline" routerLink="/login">Login</button>
+          <button class="btn btn-primary" routerLink="/register">Sign Up</button>
+        </div>
+      </ng-template>
+
+      <!-- Mobile menu toggle -->
+      <button class="mobile-toggle" (click)="toggleMobileMenu()">☰</button>
     </div>
   </div>
 </nav>

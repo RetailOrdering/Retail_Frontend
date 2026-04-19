@@ -1,66 +1,77 @@
-<div class="container" style="max-width: 900px;">
-  <h2>Checkout</h2>
-  <div class="row g-4">
-    <div class="col-md-7">
-      <div class="card border-0 shadow-sm">
-        <div class="card-body p-4">
-          <h5 class="card-title fw-semibold mb-3">Delivery Details</h5>
-          <form #checkoutForm="ngForm" (ngSubmit)="placeOrder()">
-            <div class="mb-3">
-              <label class="form-label">Full name</label>
-              <input type="text" class="form-control" [(ngModel)]="address.name" name="name" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Address</label>
-              <textarea rows="3" class="form-control" [(ngModel)]="address.line" name="address" required></textarea>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Payment method</label>
-              <select class="form-select" [(ngModel)]="paymentMethod" name="payment">
-                <option>Cash on Delivery</option>
-                <option>Credit Card</option>
-              </select>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Coupon Code</label>
-              <div class="input-group">
-                <input type="text" class="form-control" [(ngModel)]="couponCode" name="coupon">
-                <button class="btn btn-outline-secondary" type="button" (click)="applyCoupon()">Apply</button>
-              </div>
-              <small *ngIf="couponValid" class="text-success">Coupon applied: {{ discountPercent }}% off</small>
-            </div>
-            <button type="submit" class="btn btn-primary w-100 py-2" [disabled]="placingOrder">
-              {{ placingOrder ? 'Placing order...' : 'Place Order' }}
+<div class="checkout-page">
+  <div class="container">
+    <h1>Checkout</h1>
+
+    <!-- Loading state -->
+    <div *ngIf="loading" class="loader-wrapper">
+      <div class="loader"></div>
+      <p>Processing your order...</p>
+    </div>
+
+    <div *ngIf="!loading" class="checkout-content">
+      <!-- Order Summary (Left or Top on mobile) -->
+      <div class="order-summary">
+        <h2>Order Summary</h2>
+        <div class="summary-items">
+          <div class="summary-item" *ngFor="let item of cartItems">
+            <span>{{ item.productName || 'Product' }} x {{ item.quantity }}</span>
+            <span>₹{{ (item.price * item.quantity) | number:'1.2-2' }}</span>
+          </div>
+        </div>
+        <div class="summary-row">
+          <span>Subtotal</span>
+          <span>₹{{ subtotal | number:'1.2-2' }}</span>
+        </div>
+        <div class="summary-row" *ngIf="discount > 0">
+          <span>Discount ({{ couponCode }})</span>
+          <span class="discount">- ₹{{ discount | number:'1.2-2' }}</span>
+        </div>
+        <div class="summary-row total">
+          <span>Total</span>
+          <span>₹{{ total | number:'1.2-2' }}</span>
+        </div>
+
+        <!-- Loyalty Points Section -->
+        <div class="loyalty-section" *ngIf="loyaltyPoints > 0">
+          <p>You have <strong>{{ loyaltyPoints }}</strong> loyalty points</p>
+          <div class="redeem-points">
+            <input type="number" [(ngModel)]="pointsToRedeem" placeholder="Points to redeem" min="0" [max]="loyaltyPoints">
+            <button class="btn btn-outline" (click)="applyPoints()" [disabled]="!pointsToRedeem || pointsToRedeem > loyaltyPoints">
+              Redeem
             </button>
-          </form>
+          </div>
+          <p *ngIf="pointsDiscount > 0" class="points-discount">
+            Points discount: - ₹{{ pointsDiscount | number:'1.2-2' }}
+          </p>
         </div>
       </div>
-    </div>
-    <div class="col-md-5">
-      <div class="card border-0 shadow-sm">
-        <div class="card-header bg-white border-0 pt-3">
-          <h5 class="mb-0">Order Summary</h5>
-        </div>
-        <div class="card-body">
-          <ul class="list-group list-group-flush">
-            <li class="list-group-item d-flex justify-content-between px-0">
-              <span>Subtotal</span>
-              <strong>{{ subtotal | currency }}</strong>
-            </li>
-            <li class="list-group-item d-flex justify-content-between px-0" *ngIf="discountAmount > 0">
-              <span>Discount</span>
-              <span class="text-success">-{{ discountAmount | currency }}</span>
-            </li>
-            <li class="list-group-item d-flex justify-content-between px-0">
-              <span>Delivery</span>
-              <span class="text-success">Free</span>
-            </li>
-            <li class="list-group-item d-flex justify-content-between fw-bold px-0 fs-5">
-              <span>Total</span>
-              <span>{{ total | currency }}</span>
-            </li>
-          </ul>
-        </div>
+
+      <!-- Checkout Form (Right or Bottom) -->
+      <div class="checkout-form">
+        <h2>Shipping Information</h2>
+        <form #checkoutForm="ngForm" (ngSubmit)="placeOrder()">
+          <div class="form-group">
+            <label>Address *</label>
+            <textarea [(ngModel)]="orderData.address" name="address" required rows="3" placeholder="Enter your full address"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Payment Method *</label>
+            <select [(ngModel)]="orderData.paymentMethod" name="paymentMethod" required>
+              <option value="">Select</option>
+              <option value="Credit Card">Credit Card</option>
+              <option value="Debit Card">Debit Card</option>
+              <option value="UPI">UPI</option>
+              <option value="Cash on Delivery">Cash on Delivery</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Coupon Code (optional)</label>
+            <input type="text" [(ngModel)]="orderData.couponCode" name="couponCode" placeholder="Enter coupon code">
+          </div>
+          <button type="submit" class="btn btn-primary place-order-btn" [disabled]="checkoutForm.invalid || placingOrder">
+            {{ placingOrder ? 'Placing Order...' : 'Place Order' }}
+          </button>
+        </form>
       </div>
     </div>
   </div>

@@ -1,38 +1,44 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
+import { Location } from '@angular/common';
 import { OrderService } from '../../../core/services/order.service';
 import { Order } from '../../../models/order';
 
 @Component({
-  selector: 'app-order-history',
-  templateUrl: './order-history.component.html',
-  styleUrls: ['./order-history.component.css']
+  selector: 'app-order-detail',
+  templateUrl: './order-detail.component.html',
+  styleUrls: ['./order-detail.component.css']
 })
-export class OrderHistoryComponent implements OnInit {
-  orders: Order[] = [];
-  loading = false;
+export class OrderDetailComponent implements OnInit {
+  order: Order | null = null;
+  loading = true;
   error = '';
 
   constructor(
+    private route: ActivatedRoute,
     private orderService: OrderService,
-    private router: Router
+    private location: Location
   ) {}
 
   ngOnInit(): void {
-    this.loadOrders();
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) {
+      this.loadOrder(+id);
+    } else {
+      this.goBack();
+    }
   }
 
-  loadOrders(): void {
+  loadOrder(id: number): void {
     this.loading = true;
-    this.error = '';
-    this.orderService.getMyOrders().subscribe({
-      next: (orders) => {
-        this.orders = orders;
+    this.orderService.getOrderById(id).subscribe({
+      next: (order) => {
+        this.order = order;
         this.loading = false;
       },
       error: (err) => {
         console.error(err);
-        this.error = 'Failed to load orders. Please try again.';
+        this.error = 'Failed to load order details';
         this.loading = false;
       }
     });
@@ -48,16 +54,13 @@ export class OrderHistoryComponent implements OnInit {
     }
   }
 
-  viewOrder(orderId: number): void {
-    this.router.navigate(['/orders', orderId]);
-  }
-
-  cancelOrder(orderId: number): void {
+  cancelOrder(): void {
+    if (!this.order) return;
     if (confirm('Are you sure you want to cancel this order?')) {
-      this.orderService.cancelOrder(orderId).subscribe({
+      this.orderService.cancelOrder(this.order.id).subscribe({
         next: () => {
           alert('Order cancelled successfully');
-          this.loadOrders(); // refresh list
+          this.loadOrder(this.order!.id);
         },
         error: (err) => {
           console.error(err);
@@ -65,5 +68,9 @@ export class OrderHistoryComponent implements OnInit {
         }
       });
     }
+  }
+
+  goBack(): void {
+    this.location.back();
   }
 }
