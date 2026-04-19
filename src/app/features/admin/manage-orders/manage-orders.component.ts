@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { OrderService } from '../../../core/services/order.service';
 import { Order } from '../../../models/order';
+import { UpdateOrderStatusDto } from '../../../models/dto-models';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-manage-orders',
@@ -11,9 +14,8 @@ export class ManageOrdersComponent implements OnInit {
   orders: Order[] = [];
   loading = false;
   error = '';
-  statusOptions = ['Pending', 'Confirmed', 'Delivered', 'Cancelled'];
 
-  constructor(private orderService: OrderService) {}
+  constructor(private orderService: OrderService, private router: Router) {}
 
   ngOnInit(): void {
     this.loadOrders();
@@ -22,25 +24,46 @@ export class ManageOrdersComponent implements OnInit {
   loadOrders(): void {
     this.loading = true;
     this.orderService.getAllOrders().subscribe({
-      next: (data) => { this.orders = data; this.loading = false; },
-      error: (err) => { this.error = 'Failed to load orders'; this.loading = false; }
+      next: (orders) => {
+        this.orders = orders;
+        this.loading = false;
+      },
+      error: (err) => {
+        this.error = 'Failed to load orders';
+        this.loading = false;
+        console.error(err);
+      }
     });
   }
 
-  updateStatus(orderId: number, newStatus: string): void {
-    this.orderService.updateOrderStatus(orderId, { status: newStatus }).subscribe({
-      next: () => { this.loadOrders(); alert('Status updated'); },
-      error: (err) => alert('Update failed')
+  updateStatus(orderId: number, status: string): void {
+    const dto: UpdateOrderStatusDto = { status };
+    this.orderService.updateOrderStatus(orderId, dto).subscribe({
+      next: () => {
+        Swal.fire({
+          icon: 'success',
+          title: 'Updated',
+          text: 'Order status updated.',
+          timer: 1500,
+          showConfirmButton: false,
+          toast: true,
+          position: 'top-end'
+        });
+      },
+      error: (err) => {
+        console.error(err);
+        Swal.fire({
+          icon: 'error',
+          title: 'Failed',
+          text: 'Could not update status.',
+          confirmButtonColor: '#4F46E5'
+        });
+        this.loadOrders(); // revert on error
+      }
     });
   }
 
-  getStatusClass(status: string): string {
-    switch (status?.toLowerCase()) {
-      case 'pending': return 'badge-pending';
-      case 'confirmed': return 'badge-confirmed';
-      case 'delivered': return 'badge-delivered';
-      case 'cancelled': return 'badge-cancelled';
-      default: return '';
-    }
+  viewOrder(orderId: number): void {
+    this.router.navigate(['/admin/orders', orderId]); // or to order detail
   }
 }

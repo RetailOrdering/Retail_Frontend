@@ -3,8 +3,10 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ProductService } from '../../../core/services/product.service';
 import { CategoryService } from '../../../core/services/category.service';
 import { CartService } from '../../../core/services/cart.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { Product } from '../../../models/product';
 import { AddToCartDto } from '../../../models/dto-models';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-product-detail',
@@ -23,6 +25,7 @@ export class ProductDetailComponent implements OnInit {
     private productService: ProductService,
     private categoryService: CategoryService,
     private cartService: CartService,
+    private authService: AuthService,
     private router: Router
   ) {}
 
@@ -50,6 +53,12 @@ export class ProductDetailComponent implements OnInit {
       error: (err) => {
         console.error(err);
         this.loading = false;
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Could not load product details. Please try again.',
+          confirmButtonColor: '#4F46E5'
+        });
         this.router.navigate(['/products']);
       }
     });
@@ -57,9 +66,7 @@ export class ProductDetailComponent implements OnInit {
 
   loadCategoryName(categoryId: number): void {
     this.categoryService.getCategoryById(categoryId).subscribe({
-      next: (category) => {
-        this.categoryName = category.name;
-      },
+      next: (category) => this.categoryName = category.name,
       error: (err) => console.error('Could not load category', err)
     });
   }
@@ -95,20 +102,53 @@ export class ProductDetailComponent implements OnInit {
   }
 
   addToCart(): void {
-    if (this.product && this.product.isAvailable && this.product.stock > 0) {
-      const dto: AddToCartDto = {
-        productId: this.product.id,
-        quantity: this.quantity
-      };
-      this.cartService.addToCart(dto).subscribe({
-        next: () => {
-          alert(`Added ${this.quantity} x ${this.product!.name} to cart`);
-        },
-        error: (err) => {
-          console.error(err);
-          alert('Failed to add to cart. Please try again.');
+    if (!this.product || !this.product.isAvailable || this.product.stock <= 0) return;
+
+    // Check if user is logged in
+    const isLoggedIn = this.authService.getCurrentUser() !== null;
+    if (!isLoggedIn) {
+      Swal.fire({
+        title: 'Login Required',
+        text: 'Please login to add items to your cart',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#4F46E5',
+        cancelButtonColor: '#6B7280',
+        confirmButtonText: 'Login Now',
+        cancelButtonText: 'Stay'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this.router.navigate(['/login']);
         }
       });
+      return;
     }
+
+    const dto: AddToCartDto = {
+      productId: this.product.id,
+      quantity: this.quantity
+    };
+    this.cartService.addToCart(dto).subscribe({
+      next: () => {
+        Swal.fire({
+          icon: 'success',
+          title: 'Added to Cart',
+          html: `${this.quantity} × <strong>${this.product!.name}</strong> added to your cart.`,
+          timer: 2000,
+          showConfirmButton: false,
+          toast: true,
+          position: 'top-end'
+        });
+      },
+      error: (err) => {
+        console.error(err);
+        Swal.fire({
+          icon: 'error',
+          title: 'Failed',
+          text: 'Could not add to cart. Please try again.',
+          confirmButtonColor: '#4F46E5'
+        });
+      }
+    });
   }
 }

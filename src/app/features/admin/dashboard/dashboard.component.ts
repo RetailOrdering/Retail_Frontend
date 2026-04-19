@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AdminService } from '../../../core/services/admin.service';
 import { User } from '../../../models/user';
 import { Product } from '../../../models/product';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-dashboard',
@@ -9,65 +10,57 @@ import { Product } from '../../../models/product';
   styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent implements OnInit {
-  loading = false;
-  error = '';
-  dashboardData: any = null;
+  dashboardData: any = {};
   users: User[] = [];
   lowStockProducts: Product[] = [];
-  showUsers = false;
-  showLowStock = false;
+  loading = true;
+  error = '';
 
   constructor(private adminService: AdminService) {}
 
   ngOnInit(): void {
-    this.loadDashboard();
+    this.loadData();
   }
 
-  loadDashboard(): void {
+  loadData(): void {
     this.loading = true;
     this.adminService.getDashboard().subscribe({
-      next: (data) => {
-        this.dashboardData = data;
-        this.loading = false;
-      },
-      error: (err) => {
-        console.error(err);
-        this.error = 'Failed to load dashboard data';
-        this.loading = false;
-      }
+      next: (data) => this.dashboardData = data,
+      error: (err) => console.error(err)
+    });
+    this.adminService.getAllUsers().subscribe({
+      next: (users) => this.users = users,
+      error: (err) => console.error(err)
+    });
+    this.adminService.getLowStockProducts().subscribe({
+      next: (products) => this.lowStockProducts = products,
+      error: (err) => console.error(err),
+      complete: () => this.loading = false
     });
   }
 
-  loadUsers(): void {
-    if (this.users.length === 0) {
-      this.adminService.getAllUsers().subscribe({
-        next: (users) => this.users = users,
-        error: (err) => console.error(err)
-      });
-    }
-    this.showUsers = !this.showUsers;
-    this.showLowStock = false;
-  }
-
-  loadLowStock(): void {
-    if (this.lowStockProducts.length === 0) {
-      this.adminService.getLowStockProducts().subscribe({
-        next: (products) => this.lowStockProducts = products,
-        error: (err) => console.error(err)
-      });
-    }
-    this.showLowStock = !this.showLowStock;
-    this.showUsers = false;
-  }
-
-  updateUserRole(userId: number, newRole: string): void {
-    this.adminService.updateUserRole(userId, { role: newRole }).subscribe({
+  updateRole(userId: number, role: string): void {
+    this.adminService.updateUserRole(userId, { role }).subscribe({
       next: () => {
-        const user = this.users.find(u => u.id === userId);
-        if (user) user.role = newRole as 'Admin' | 'Customer';
-        alert('User role updated');
+        Swal.fire({
+          icon: 'success',
+          title: 'Updated',
+          text: 'User role updated successfully.',
+          timer: 1500,
+          showConfirmButton: false,
+          toast: true,
+          position: 'top-end'
+        });
       },
-      error: (err) => console.error(err)
+      error: (err) => {
+        console.error(err);
+        Swal.fire({
+          icon: 'error',
+          title: 'Failed',
+          text: 'Could not update user role.',
+          confirmButtonColor: '#4F46E5'
+        });
+      }
     });
   }
 }

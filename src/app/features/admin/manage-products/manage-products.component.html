@@ -1,38 +1,34 @@
-<div class="manage-products">
+<div class="manage-page">
   <div class="container">
-    <div class="header"><h1>Manage Products</h1><button class="btn btn-primary" (click)="openCreateForm()">+ Add Product</button></div>
+    <div class="page-header">
+      <h1>Manage Products</h1>
+      <button class="btn btn-primary" (click)="openAddModal()">+ Add Product</button>
+    </div>
 
-    <div *ngIf="loading" class="loader-wrapper"><div class="loader"></div></div>
-    <div *ngIf="error" class="error-message">{{ error }}</div>
+    <div *ngIf="loading" class="loader-wrapper"><div class="loader"></div><p>Loading products...</p></div>
+    <div *ngIf="error" class="error-message">{{ error }} <button class="btn btn-outline" (click)="loadProducts()">Retry</button></div>
 
-    <div *ngIf="!loading && !error">
+    <div *ngIf="!loading && !error && products.length === 0" class="empty-state">No products found.</div>
+
+    <div *ngIf="!loading && !error && products.length > 0" class="table-responsive">
       <table class="data-table">
-        <thead><tr><th>ID</th><th>Name</th><th>Brand</th><th>Price</th><th>Stock</th><th>Available</th><th>Actions</th></tr></thead>
+        <thead>
+          <tr><th>ID</th><th>Name</th><th>Price</th><th>Stock</th><th>Available</th><th>Actions</th></tr>
+        </thead>
         <tbody>
-          <tr *ngFor="let p of products">
-            <td>{{ p.id }}</td><td>{{ p.name }}</td><td>{{ p.brand }}</td><td>₹{{ p.price }}</td>
-            <td [class.low-stock]="p.stock <=5">{{ p.stock }}</td>
-            <td>{{ p.isAvailable ? '✅' : '❌' }}</td>
-            <td><button class="btn-sm btn-outline" (click)="editProduct(p)">Edit</button> <button class="btn-sm btn-danger" (click)="deleteProduct(p.id)">Delete</button></td>
+          <tr *ngFor="let product of products">
+            <td>{{ product.id }}</td>
+            <td>{{ product.name }}</td>
+            <td>₹{{ product.price | number:'1.2-2' }}</td>
+            <td>{{ product.stock }}</td>
+            <td><span class="badge" [class.badge-success]="product.isAvailable" [class.badge-danger]="!product.isAvailable">{{ product.isAvailable ? 'Yes' : 'No' }}</span></td>
+            <td>
+              <button class="btn-icon edit" (click)="openEditModal(product)">✏️</button>
+              <button class="btn-icon delete" (click)="deleteProduct(product.id)">🗑️</button>
+            </td>
           </tr>
         </tbody>
       </table>
     </div>
-
-    <!-- Product Form Modal -->
-    <div class="modal" *ngIf="showForm"><div class="modal-content">
-      <h2>{{ editingProduct ? 'Edit Product' : 'New Product' }}</h2>
-      <form (ngSubmit)="submitForm()">
-        <input [(ngModel)]="formData.name" name="name" placeholder="Name" required>
-        <textarea [(ngModel)]="formData.description" name="description" placeholder="Description"></textarea>
-        <input type="number" [(ngModel)]="formData.price" name="price" placeholder="Price" required>
-        <input [(ngModel)]="formData.packaging" name="packaging" placeholder="Packaging">
-        <input [(ngModel)]="formData.brand" name="brand" placeholder="Brand">
-        <select [(ngModel)]="formData.categoryId" name="categoryId" required><option [value]="0">Select Category</option><option *ngFor="let cat of categories" [value]="cat.id">{{ cat.name }}</option></select>
-        <input type="number" [(ngModel)]="formData.stock" name="stock" placeholder="Stock" required>
-        <label><input type="checkbox" [(ngModel)]="formData.isAvailable" name="isAvailable"> Available</label>
-        <div class="form-buttons"><button type="submit" class="btn btn-primary">Save</button><button type="button" class="btn btn-outline" (click)="cancelForm()">Cancel</button></div>
-      </form>
-    </div></div>
   </div>
 </div>

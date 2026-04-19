@@ -21,6 +21,7 @@ import { FooterComponent } from './shared/components/footer/footer.component';
 import { ProductCardComponent } from './shared/components/product-card/product-card.component';
 import { LoaderComponent } from './shared/components/loader/loader.component';
 import { AuthInterceptor } from './core/interceptors/auth.interceptor';
+import { HomeComponent } from './shared/components/home/home.component';
 
 @NgModule({
   declarations: [
@@ -39,7 +40,8 @@ import { AuthInterceptor } from './core/interceptors/auth.interceptor';
     NavbarComponent,
     FooterComponent,
     ProductCardComponent,
-    LoaderComponent
+    LoaderComponent,
+    HomeComponent
   ],
   imports: [
     BrowserModule,

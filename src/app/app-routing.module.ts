@@ -13,13 +13,16 @@ import { ProductDetailComponent } from './features/products/product-detail/produ
 import { CartPageComponent } from './features/cart/cart-page/cart-page.component';
 import { CheckoutComponent } from './features/orders/checkout/checkout.component';
 import { OrderHistoryComponent } from './features/orders/order-history/order-history.component';
-import { OrderDetailComponent } from './features/orders/order-detail/order-detail.component'; // ✅ Added
+import { OrderDetailComponent } from './features/orders/order-detail/order-detail.component';
 import { DashboardComponent } from './features/admin/dashboard/dashboard.component';
 import { ManageProductsComponent } from './features/admin/manage-products/manage-products.component';
 import { ManageOrdersComponent } from './features/admin/manage-orders/manage-orders.component';
+import { HomeComponent } from './shared/components/home/home.component';
 
 const routes: Routes = [
   // Public routes
+  { path: '', component: HomeComponent },                       // ✅ Home page as default
+  { path: 'home', component: HomeComponent },                   // ✅ Explicit home route
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'products', component: ProductListComponent },
@@ -29,18 +32,15 @@ const routes: Routes = [
   { path: 'cart', component: CartPageComponent, canActivate: [AuthGuard] },
   { path: 'checkout', component: CheckoutComponent, canActivate: [AuthGuard] },
   { path: 'orders', component: OrderHistoryComponent, canActivate: [AuthGuard] },
-  { path: 'orders/:id', component: OrderDetailComponent, canActivate: [AuthGuard] }, // ✅ Added – note order matters: place after 'orders'
+  { path: 'orders/:id', component: OrderDetailComponent, canActivate: [AuthGuard] },
   
   // Admin routes (require admin role)
   { path: 'admin/dashboard', component: DashboardComponent, canActivate: [AdminGuard] },
   { path: 'admin/products', component: ManageProductsComponent, canActivate: [AdminGuard] },
   { path: 'admin/orders', component: ManageOrdersComponent, canActivate: [AdminGuard] },
   
-  // Default route
-  { path: '', redirectTo: '/products', pathMatch: 'full' },
-  
   // Wildcard route (404)
-  { path: '**', redirectTo: '/products' }
+  { path: '**', redirectTo: '' }                                 // ✅ Redirect to home
 ];
 
 @NgModule({
